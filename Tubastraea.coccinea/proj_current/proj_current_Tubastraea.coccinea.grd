@@ -1,0 +1,21 @@
+[general]
+[data]
+datatype=INT2S
+nodatavalue=-9999
+byteorder=little
+nbands=20
+bandorder=BIL
+minvalue=100:0:154:0:126:0:91:14:100:24:100:0:91:30:91:7:0:0:47:0
+maxvalue=875:1000:884:1000:909:1000:1000:998:875:966:875:1000:1000:959:1000:997:1000:1000:921:1000
+categorical=FALSE
+[description]
+layername=Tubastraea.coccinea_allData_RUN1_GLM:Tubastraea.coccinea_allData_RUN1_RF:Tubastraea.coccinea_allData_RUN2_GLM:Tubastraea.coccinea_allData_RUN2_RF:Tubastraea.coccinea_allData_RUN3_GLM:Tubastraea.coccinea_allData_RUN3_RF:Tubastraea.coccinea_allData_RUN4_GLM:Tubastraea.coccinea_allData_RUN4_RF:Tubastraea.coccinea_allData_RUN5_GLM:Tubastraea.coccinea_allData_RUN5_RF:Tubastraea.coccinea_allData_RUN6_GLM:Tubastraea.coccinea_allData_RUN6_RF:Tubastraea.coccinea_allData_RUN7_GLM:Tubastraea.coccinea_allData_RUN7_RF:Tubastraea.coccinea_allData_RUN8_GLM:Tubastraea.coccinea_allData_RUN8_RF:Tubastraea.coccinea_allData_RUN9_GLM:Tubastraea.coccinea_allData_RUN9_RF:Tubastraea.coccinea_allData_RUN10_GLM:Tubastraea.coccinea_allData_RUN10_RF
+[georeference]
+nrows=582
+ncols=250
+xmin=-48.7723183760000012
+ymin=-28.4616327429999991
+xmax=-47.7721809769999979
+ymax=-26.1316515480000007
+projection=+proj=longlat +datum=WGS84 +no_defs
+wkt=GEOGCRS["unknown",DATUM["World Geodetic System 1984",ELLIPSOID["WGS 84",6378137,298.257223563,LENGTHUNIT["metre",1]],ID["EPSG",6326]],PRIMEM["Greenwich",0,ANGLEUNIT["degree",0.0174532925199433],ID["EPSG",8901]],CS[ellipsoidal,2],AXIS["longitude",east,ORDER[1],ANGLEUNIT["degree",0.0174532925199433,ID["EPSG",9122]]],AXIS["latitude",north,ORDER[2],ANGLEUNIT["degree",0.0174532925199433,ID["EPSG",9122]]]]
