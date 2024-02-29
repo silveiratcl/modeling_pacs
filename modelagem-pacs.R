@@ -5,8 +5,8 @@
 
 ################################################################################
 
-
-setwd("C:/Users/silve/OneDrive/Documentos/Academico/POS-DOC_UFSC/@Karon Coral Sol/modelling/modeling_pacs_2024/modeling_pacs")
+#set ti your path
+#setwd("C:/Users/silve/OneDrive/Documentos/Academico/POS-DOC_UFSC/@Karon Coral Sol/modelling/modeling_pacs_2024/modeling_pacs")
 
 ## Instalando os pacotes
 #install.packages("raster")
