@@ -5,7 +5,7 @@
 
 ################################################################################
 
-#set ti your path
+#set to your path
 #setwd("C:/Users/silve/OneDrive/Documentos/Academico/POS-DOC_UFSC/@Karon Coral Sol/modelling/modeling_pacs_2024/modeling_pacs")
 
 ## Instalando os pacotes
@@ -126,6 +126,7 @@ df$X <- NULL
 names(df) <- c ('occ_abs', 'lon_dd', 'lat_dd')
 head(df)
 
+df
 
 ## Criando um stack, ou seja, uma coleção de camadas raster, para as variáveis
 # Stack - empilhamento
@@ -134,6 +135,9 @@ variables <- stack(variables)
 names(variables) <- c ('bat', 'velc', 'sst', 'd_cost', 'd_mar', 'd_traf', 'mhw', 'mcs')
 variables
 str(variables)
+plot(variables$d_traf)
+points(df[1:8,2:3], col = "red")
+points(df[9:25,2:3], col = "blue")
 
 ## Extraindo os valores das camadas
 # valor de cada variavel pra cada coordenada
@@ -145,6 +149,8 @@ sdmdata <- data.frame(cbind(pb, rbind(occvals, absvals)))
 head(sdmdata)
 tail(sdmdata)
 summary(sdmdata) 
+
+sdmdata
 
 saveRDS(sdmdata, "./occ_abs_cs/sdm.Rds")
 saveRDS(occvals, "./occ_abs_cs/occvals.Rds")
@@ -196,6 +202,7 @@ myBiomodModelOut1 <- BIOMOD_Modeling(myBiomodData1,
                                      var.import=3,# numero de vezes que o modelo faz a analise da importancia da variavel atraves do sorteio
                                      metric.eval = c('ROC', 'TSS'),# quanto o modelo acerta o 1 e o 0 > capacidade de acertar de fato os verdadeiros 1 e 0 #quanto maior a área da curva, indica que ta acertando bem                                     SaveObj = TRUE,
                                      scale.models = TRUE,
+                                     #seed.val = 32,
                                      modeling.id = paste(myRespName,"Model1",sep=""))
                                      
 
@@ -203,7 +210,7 @@ myBiomodModelOut1
 
 
 ## Obtendo a avaliação de todos os modelos
-get_evaluations(myBiomodModelOut1)
+get_evaluations(myBiomodModelOut1, algo = "RF" )
 get_variables_importance(myBiomodModelOut1)
 
 
