@@ -202,7 +202,7 @@ myBiomodModelOut1 <- BIOMOD_Modeling(myBiomodData1,
                                      var.import=3,# numero de vezes que o modelo faz a analise da importancia da variavel atraves do sorteio
                                      metric.eval = c('ROC', 'TSS'),# quanto o modelo acerta o 1 e o 0 > capacidade de acertar de fato os verdadeiros 1 e 0 #quanto maior a área da curva, indica que ta acertando bem                                     SaveObj = TRUE,
                                      scale.models = TRUE,
-                                     #seed.val = 32,
+                                     #seed.val = 42,
                                      modeling.id = paste(myRespName,"Model1",sep=""))
                                      
 
@@ -210,7 +210,7 @@ myBiomodModelOut1
 
 
 ## Obtendo a avaliação de todos os modelos
-get_evaluations(myBiomodModelOut1, algo = "RF" )
+get_evaluations(myBiomodModelOut1 )
 get_variables_importance(myBiomodModelOut1)
 
 
