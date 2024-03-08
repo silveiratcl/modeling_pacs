@@ -5,8 +5,12 @@
 
 ################################################################################
 
-#set ti your path
-#setwd("C:/Users/silve/OneDrive/Documentos/Academico/POS-DOC_UFSC/@Karon Coral Sol/modelling/modeling_pacs_2024/modeling_pacs")
+#https://rdrr.io/cran/biomod2/f/vignettes/examples_1_mainFunctions.Rmd
+
+
+# set woriking diretory as short as possible to avoid a bug in BIOMOD_EnsembleModeling()
+setwd("C:/Users/silve/OneDrive/Área de Trabalho/modeling_pacs_2024/modeling_pacs")
+
 
 ## Instalando os pacotes
 #install.packages("raster")
@@ -167,8 +171,8 @@ myRespXY <- df[,c("lon_dd", "lat_dd")]
 
 
 variables
-predictors1 <- stack(c(variables@layers[[6]], variables@layers[[7]]))  # 4,6,8
-names(predictors1) <- c ( 'd_traf', 'mhw')
+predictors1 <- stack(c(variables@layers[[5]], variables@layers[[7]]))  # 4,6,8
+names(predictors1) <- c ( 'd_mar', 'mhw')
 predictors1
 
 
@@ -188,13 +192,13 @@ myBiomodOption
 
 ## Computando os modelos
 myBiomodModelOut1 <- BIOMOD_Modeling(myBiomodData1,
-                                     models = c('GLM','RF'), # duas metodologias "generalize linear model", usamos o logistico (minimo 0 e maximo 1)
+                                     models = c('GLM','RF'), 
                                      bm.options = myBiomodOption,
                                      CV.strategy = 'random',
                                      CV.nb.rep = 5,
                                      CV.perc = 0.7,
-                                     var.import=3,# numero de vezes que o modelo faz a analise da importancia da variavel atraves do sorteio
-                                     metric.eval = c('ROC', 'TSS'),# quanto o modelo acerta o 1 e o 0 > capacidade de acertar de fato os verdadeiros 1 e 0 #quanto maior a área da curva, indica que ta acertando bem                                     SaveObj = TRUE,
+                                     var.import=3,
+                                     metric.eval = c('ROC', 'TSS'),                                   
                                      scale.models = TRUE,
                                      modeling.id = paste(myRespName,"Model1",sep=""))
                                      
