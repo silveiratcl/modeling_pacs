@@ -307,13 +307,16 @@ bm_PlotVarImpBoxplot(bm.out = myBiomodModelOut1, group.by = c('expl.var', 'algo'
 bm_PlotVarImpBoxplot(bm.out = myBiomodModelOut1, group.by = c('algo', 'expl.var', 'run'))
 
 
+
 bm_PlotResponseCurves(bm.out = myBiomodModelOut1, 
                       models.chosen = get_built_models(myBiomodModelOut1, algo = "RF"),
                       fixed.var = 'median')
 
+
 bm_PlotResponseCurves(bm.out = myBiomodModelOut1, 
                       models.chosen = get_built_models(myBiomodModelOut1, algo = "RF"),
                       fixed.var = 'min')
+
 
 bm_PlotResponseCurves(bm.out = myBiomodModelOut1, 
                       models.chosen = get_built_models(myBiomodModelOut1, algo = "RF")[1],
@@ -321,21 +324,8 @@ bm_PlotResponseCurves(bm.out = myBiomodModelOut1,
                       do.bivariate = TRUE)
 
 
-myBiomodEM <- BIOMOD_EnsembleModeling(bm.mod = myBiomodModelOut1,
-                                      models.chosen = get_built_models(myBiomodModelOut1, algo = "RF"),
-                                      em.by = 'algo',
-                                      em.algo = c('EMwmean'),
-                                      metric.select = c('ROC'),
-                                      metric.select.thresh = c(0.7),
-                                      metric.eval = c('ROC'),
-                                      var.import = 5,
-                                      EMci.alpha = 0.05,
-                                      EMwmean.decay = 'proportional')
 
-
-
-
-# Projection
+# Projection # no need ensemble because is just one model. The projection make 
 
 myBiomodProj <- BIOMOD_Projection(bm.mod = myBiomodModelOut1,
                                   proj.name = 'Current',
@@ -345,76 +335,20 @@ myBiomodProj <- BIOMOD_Projection(bm.mod = myBiomodModelOut1,
                                   metric.filter = 'ROC',
                                   build.clamping.mask = TRUE)
 
-myBiomodProj
-
-plot(myBiomodProj)
-
-
-
-
-
-
-
-
-# Get evaluation scores & variables importance
-get_evaluations(myBiomodEM)
-get_variables_importance(myBiomodEM)
-
-# Represent evaluation scores & variables importance
-bm_PlotEvalMean(bm.out = myBiomodEM, group.by = 'full.name')
-bm_PlotEvalBoxplot(bm.out = myBiomodEM, group.by = c('full.name', 'full.name'))
-bm_PlotVarImpBoxplot(bm.out = myBiomodEM, group.by = c('expl.var', 'full.name', 'full.name'))
-bm_PlotVarImpBoxplot(bm.out = myBiomodEM, group.by = c('expl.var', 'algo', 'merged.by.run'))
-bm_PlotVarImpBoxplot(bm.out = myBiomodEM, group.by = c('algo', 'expl.var', 'merged.by.run'))
-
-# Represent response curves
-bm_PlotResponseCurves(bm.out = myBiomodEM, 
-                      models.chosen = get_built_models(myBiomodEM)[c(1, 6, 7)],
-                      fixed.var = 'median')
-bm_PlotResponseCurves(bm.out = myBiomodEM, 
-                      models.chosen = get_built_models(myBiomodEM)[c(1, 6, 7)],
-                      fixed.var = 'min')
-bm_PlotResponseCurves(bm.out = myBiomodEM, 
-                      models.chosen = get_built_models(myBiomodEM)[7],
-                      fixed.var = 'median',
-                      do.bivariate = TRUE)
-
-
-
-
-## Projetando sobre o globo nas condições atuais
-myBiomodProj <- BIOMOD_Projection(
-  bm.mod = myBiomodModelOut1,
-  new.env = predictors1,
-  proj.name = 'current',
-  selected.models = 'all',
-  binary.meth = 'ROC',
-  compress = 'xz',
-  build.clamping.mask = FALSE,
-  output.format = '.grd')
-myBiomodProj
 
 list.files("Tubastraea.coccinea./proj_current/")
 
+
 plot(myBiomodProj)
-plot(myBiomodProj, str.grep = 'GLM')
 plot(myBiomodProj, str.grep = 'RF')
 
 
 
 #importing files
-EMcaByROC <- raster("./Tubastraea.coccinea/proj_current/individual_projections/Tubastraea.coccinea_EMcaByROC_mergedAlgo_mergedRun_mergedData.grd")
-EMcvByROC <- raster("./Tubastraea.coccinea/proj_current/individual_projections/Tubastraea.coccinea_EMcvByROC_mergedAlgo_mergedRun_mergedData.grd")
-EMmeanByROC <- raster("./Tubastraea.coccinea/proj_current/individual_projections/Tubastraea.coccinea_EMmeanByROC_mergedAlgo_mergedRun_mergedData.grd")
-EMmedianByROC <- raster("./Tubastraea.coccinea/proj_current/individual_projections/Tubastraea.coccinea_EMmedianByROC_mergedAlgo_mergedRun_mergedData.grd")
-EMwmeanByROC <- raster("./Tubastraea.coccinea/proj_current/individual_projections/Tubastraea.coccinea_EMwmeanByROC_mergedAlgo_mergedRun_mergedData.grd")
 
+ProjRF <- raster("./Tubastraea.coccinea/proj_current/proj_Current_Tubastraea.coccinea.tif")
+plot(ProjRF/1000) # customize plot
 
-#projecting ensembled model
-myBiomodEMProj <- stack(EMcaByROC, EMcvByROC, EMmeanByROC, EMmedianByROC, EMwmeanByROC)
-names(myBiomodEMProj) <- c('EMcaByROC', 'EMcvByROC', 'EMmeanByROC', 'EMmedianByROC', 'EMwmeanByROC')
-myBiomodEMProj
-plot(myBiomodEMProj)
 
 
 ################################################################################
