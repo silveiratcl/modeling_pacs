@@ -5,17 +5,17 @@
 
 ################################################################################
 
-<<<<<<< HEAD
+
 #https://rdrr.io/cran/biomod2/f/vignettes/examples_1_mainFunctions.Rmd
 
 
 # set woriking diretory as short as possible to avoid a bug in BIOMOD_EnsembleModeling()
 setwd("C:/Users/silve/OneDrive/Área de Trabalho/modeling_pacs_2024/modeling_pacs")
 
-=======
+
 #set to your path
 #setwd("C:/Users/silve/OneDrive/Documentos/Academico/POS-DOC_UFSC/@Karon Coral Sol/modelling/modeling_pacs_2024/modeling_pacs")
->>>>>>> vic_dev
+
 
 ## Instalando os pacotes
 #install.packages("raster")
@@ -75,6 +75,7 @@ d_mar <- raster("./layers/d_mar_resampled.tif")
 d_traf <- raster("./layers/d_traf_resampled.tif")
 mhw <- raster("./layers/mhw_resampled.tif")
 mcs <- raster("./layers/mcs_resampled.tif")
+dist_inv <- raster("./layers/dist_inv.tiff")
 
 ## Filtro de proximidade
 filterByProximity <- function(xy, dist, mapUnits = F) {
@@ -139,9 +140,9 @@ df
 
 ## Criando um stack, ou seja, uma coleção de camadas raster, para as variáveis
 # Stack - empilhamento
-variables <- c(bat, velc, sst, d_cost, d_mar, d_traf, mhw, mcs)
+variables <- c(bat, velc, sst, d_cost, d_mar, d_traf, mhw, mcs, dist_inv)
 variables <- stack(variables)
-names(variables) <- c ('bat', 'velc', 'sst', 'd_cost', 'd_mar', 'd_traf', 'mhw', 'mcs')
+names(variables) <- c ('bat', 'velc', 'sst', 'd_cost', 'd_mar', 'd_traf', 'mhw', 'mcs', 'dist_inv')
 variables
 str(variables)
 plot(variables$d_traf)
@@ -168,9 +169,9 @@ saveRDS(absvals, "./occ_abs_cs/absvals.Rds")
 
 ## Examinando as correlações entre as variáveis
 myData <- sdmdata
-describe(myData[,c(2:9)])
+describe(myData[,c(2:10)])
 
-pairs.panels(myData[,c(2:9)],pch='.')
+pairs.panels(myData[,c(2:10)],pch='.')
 lowerCor(myData[,c(2:9)])
 dev.off()
 
@@ -191,6 +192,9 @@ predictors2 <- stack(c(variables@layers[[5]], variables@layers[[8]]))  # 5, 8
 names(predictors2) <- c ( 'd_mar', 'mcs')
 predictors2
 
+predictors3 <- stack(c(variables@layers[[5]], variables@layers[[9]]))  # 5, 8
+names(predictors3) <- c ( 'd_mar', 'dist_inv')
+predictors3
 
 
 
@@ -206,6 +210,10 @@ myBiomodData2 <- BIOMOD_FormatingData(resp.var = DataSpecies,
                                       resp.xy = myRespXY,
                                       resp.name = myRespName)
 
+myBiomodData3 <- BIOMOD_FormatingData(resp.var = DataSpecies,
+                                      expl.var = predictors3,
+                                      resp.xy = myRespXY,
+                                      resp.name = myRespName)
 
 
 
@@ -246,7 +254,19 @@ myBiomodModelOut2 <- BIOMOD_Modeling(myBiomodData2,
 myBiomodModelOut2
 
 
+myBiomodModelOut3 <- BIOMOD_Modeling(myBiomodData3,
+                                     models = c('RF'),  
+                                     bm.options = myBiomodOption,
+                                     CV.strategy = 'random',
+                                     CV.nb.rep = 5,
+                                     CV.perc = 0.7,
+                                     var.import=3,
+                                     metric.eval = c('ROC', 'TSS'),
+                                     scale.models = TRUE,
+                                     #seed.val = 42,
+                                     modeling.id = paste(myRespName,"Model1",sep=""))
 
+myBiomodModelOut3
 
 ## MOdel evaluation
 
@@ -260,10 +280,14 @@ eval_myBiomodModelOut2<-as_tibble(get_evaluations(myBiomodModelOut2)) %>%
   mutate(model = paste("model_2"),
          preds = paste('d_mar + mcs'))
 
+eval_myBiomodModelOut3<-as_tibble(get_evaluations(myBiomodModelOut3)) %>% 
+  mutate(model = paste("model_3"),
+         preds = paste('d_mar + dist_inv'))
  
 
 eval_list <- list(eval_myBiomodModelOut1,
-                  eval_myBiomodModelOut2)
+                  eval_myBiomodModelOut2,
+                  eval_myBiomodModelOut3)
 
 # Combining eval tables ordering by the higher values
 # of average ROC across the model runs 
