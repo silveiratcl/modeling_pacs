@@ -173,9 +173,15 @@ myRespXY <- df[,c("lon_dd", "lat_dd")]
 
 
 variables
-predictors1 <- stack(c(variables@layers[[6]], variables@layers[[7]]))  # 4,6,8
+predictors1 <- stack(c(variables@layers[[6]], variables@layers[[7]]))  # 6, 7
 names(predictors1) <- c ( 'd_traf', 'mhw')
 predictors1
+
+predictors2 <- stack(c(variables@layers[[5]], variables@layers[[8]]))  # 5, 8
+names(predictors2) <- c ( 'd_mar', 'mcs')
+predictors2
+
+
 
 
 ## Formatando os dados
@@ -183,6 +189,13 @@ myBiomodData1 <- BIOMOD_FormatingData(resp.var = DataSpecies,
                                       expl.var = predictors1,
                                       resp.xy = myRespXY,
                                       resp.name = myRespName)
+
+myBiomodData2 <- BIOMOD_FormatingData(resp.var = DataSpecies,
+                                      expl.var = predictors2,
+                                      resp.xy = myRespXY,
+                                      resp.name = myRespName)
+
+
 
 
 ## Definindo opções de modelos usando opções padrão
@@ -207,12 +220,64 @@ myBiomodModelOut1 <- BIOMOD_Modeling(myBiomodData1,
 
 myBiomodModelOut1
 
+myBiomodModelOut2 <- BIOMOD_Modeling(myBiomodData2,
+                                     models = c('GLM','RF'),  
+                                     bm.options = myBiomodOption,
+                                     CV.strategy = 'random',
+                                     CV.nb.rep = 5,
+                                     CV.perc = 0.7,
+                                     var.import=3,
+                                     metric.eval = c('ROC', 'TSS'),
+                                     scale.models = TRUE,
+                                     #seed.val = 42,
+                                     modeling.id = paste(myRespName,"Model1",sep=""))
 
+myBiomodModelOut2
+
+
+
+
+## MOdel evaluation
+
+
+# eval object
+eval_myBiomodModelOut1<-as_tibble(get_evaluations(myBiomodModelOut1)) %>% 
+  mutate(model = paste("model_1"),# grouping model Hypotesys
+         preds = paste('d_traf_mhw')) # paste preds
+
+eval_myBiomodModelOut2<-as_tibble(get_evaluations(myBiomodModelOut2)) %>% 
+  mutate(model = paste("model_2"),
+         preds = paste('d_mar_mcs'))
+
+ 
+
+eval_list <- list(eval_myBiomodModelOut1,
+                  eval_myBiomodModelOut2)
+
+# Combining eval tables ordering by the higher values
+# of average ROC across the model runs 
+library(tidyverse)
+eval_list_table <- eval_list %>% 
+  # bind tables by row
+  bind_rows() %>% 
+  # filtering by metric eval and algo
+  filter(metric.eval == "ROC", algo == "RF") %>% 
+  group_by(model, algo, metric.eval) %>%
+  summarise(avg_validation = mean(validation),
+            sd_validation = sd(validation)) %>% 
+  arrange(-avg_validation) %>% 
+  ungroup()
+  
+eval_list_table
+
+<<<<<<< HEAD
 ## Obtendo a avaliação de todos os modelos
 get_evaluations(myBiomodModelOut1 )
 eval1 <- get_evaluations(myBiomodModelOut1)
 eval1
 get_variables_importance(myBiomodModelOut1)
+=======
+>>>>>>> 2e3492ba2387277608ce3e31b1354c5f66cf72f3
 
 ## Criando um df só para sensitividade e especificidade de cada rodada
 df_eval1 <- rbind(eval1[c(7:8)])
@@ -250,6 +315,12 @@ bm_PlotResponseCurves(bm.out = myBiomodModelOut1,
                       models.chosen = get_built_models(myBiomodModelOut1)[2],
                       fixed.var = 'median',
                       do.bivariate = TRUE)
+
+
+
+
+
+
 
 ###### RESOLVER aqui
 # Model ensemble models
