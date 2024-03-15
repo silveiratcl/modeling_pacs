@@ -224,15 +224,7 @@ myBiomodOption
 
 ## Computando os modelos
 myBiomodModelOut1 <- BIOMOD_Modeling(myBiomodData1,
-<<<<<<< HEAD
-<<<<<<< HEAD
-                                     models = c('RF'), # duas metodologias "generalize linear model", usamos o logistico (minimo 0 e maximo 1)
-=======
-                                     models = c('RF', 'GLM'), 
->>>>>>> thiago_dev
-=======
                                      models = c('RF','GLM'), 
->>>>>>> main
                                      bm.options = myBiomodOption,
                                      CV.strategy = 'random',
                                      CV.nb.rep = 5,
@@ -247,7 +239,7 @@ myBiomodModelOut1 <- BIOMOD_Modeling(myBiomodData1,
 myBiomodModelOut1
 
 myBiomodModelOut2 <- BIOMOD_Modeling(myBiomodData2,
-                                     models = c('RF'),  
+                                     models = c('RF', 'GLM'),  
                                      bm.options = myBiomodOption,
                                      CV.strategy = 'random',
                                      CV.nb.rep = 5,
@@ -262,7 +254,7 @@ myBiomodModelOut2
 
 
 myBiomodModelOut3 <- BIOMOD_Modeling(myBiomodData3,
-                                     models = c('RF'),  
+                                     models = c('RF', 'GLM'),  
                                      bm.options = myBiomodOption,
                                      CV.strategy = 'random',
                                      CV.nb.rep = 5,
@@ -312,15 +304,11 @@ eval_list_table <- eval_list %>%
   
 eval_list_table
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 ## Obtendo a avaliação de todos os modelos
 get_evaluations(myBiomodModelOut1 )
 eval1 <- get_evaluations(myBiomodModelOut1)
 eval1
 get_variables_importance(myBiomodModelOut1)
-=======
->>>>>>> 2e3492ba2387277608ce3e31b1354c5f66cf72f3
 
 ## Criando um df só para sensitividade e especificidade de cada rodada
 df_eval1 <- rbind(eval1[c(7:8)])
@@ -339,9 +327,8 @@ group_by(eval1) %>%
   select(run:validation) %>%
   head()
 
-=======
 # Model One had the best performance 
->>>>>>> thiago_dev
+
 #Represent evaluation scores & variables importance
 
 bm_PlotEvalMean(bm.out = myBiomodModelOut1)
@@ -371,6 +358,10 @@ bm_PlotResponseCurves(bm.out = myBiomodModelOut1,
                       models.chosen = get_built_models(myBiomodModelOut1)[c(1,3,5,7,9)], ####feito!
                       fixed.var = 'median')
 
+mods <- get_built_models(myBiomodModelOut, run = 'RUN1', 'RF')
+bm_PlotResponseCurves(bm.out = myBiomodModelOut, 
+#                       models.chosen = mods,
+#                       fixed.var = 'median')
 
 bm_PlotResponseCurves(bm.out = myBiomodModelOut1, 
                       models.chosen = get_built_models(myBiomodModelOut1, algo = "RF"),
