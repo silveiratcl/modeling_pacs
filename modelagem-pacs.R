@@ -248,7 +248,7 @@ myBiomodModelOut2 <- BIOMOD_Modeling(myBiomodData2,
                                      metric.eval = c('ROC', 'TSS'),
                                      scale.models = TRUE,
                                      #seed.val = 42,
-                                     modeling.id = paste(myRespName,"Model1",sep=""))
+                                     modeling.id = paste(myRespName,"Model2",sep="")) ### model 2
 
 myBiomodModelOut2
 
@@ -263,7 +263,7 @@ myBiomodModelOut3 <- BIOMOD_Modeling(myBiomodData3,
                                      metric.eval = c('ROC', 'TSS'),
                                      scale.models = TRUE,
                                      #seed.val = 42,
-                                     modeling.id = paste(myRespName,"Model1",sep=""))
+                                     modeling.id = paste(myRespName,"Model3",sep="")) ### model 3
 
 myBiomodModelOut3
 
@@ -304,6 +304,9 @@ eval_list_table <- eval_list %>%
   
 eval_list_table
 
+##########
+########## Aqui esta soprepondo o quie já foi feito para chegar em eval_list_table
+########## Reavalair  e discutir aqui
 ## Obtendo a avaliação de todos os modelos
 get_evaluations(myBiomodModelOut1 )
 eval1 <- get_evaluations(myBiomodModelOut1)
@@ -315,7 +318,7 @@ df_eval1 <- rbind(eval1[c(7:8)])
 df_eval1
 
 ## Média e desvio padrão de cada modelo
-eval1 <- as_tibble(eval1)
+eval1 <- as_tibble(eval1) 
 eval1
 
 eval1 %>%
@@ -327,6 +330,9 @@ group_by(eval1) %>%
   select(run:validation) %>%
   head()
 
+############  
+############  
+  
 # Model One had the best performance 
 
 #Represent evaluation scores & variables importance
