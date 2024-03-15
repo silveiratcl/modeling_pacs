@@ -225,7 +225,7 @@ myBiomodOption
 
 ## Computando os modelos
 myBiomodModelOut1 <- BIOMOD_Modeling(myBiomodData1,
-                                     models = c('RF', 'GLM'), 
+                                     models = c('RF','GLM'), 
                                      bm.options = myBiomodOption,
                                      CV.strategy = 'random',
                                      CV.nb.rep = 5,
@@ -301,7 +301,6 @@ eval_list_table <- eval_list %>%
   summarise(avg_validation = mean(validation),
             sd_validation = sd(validation)) %>% 
   arrange(-avg_validation) %>% 
-   
   ungroup()
   
 eval_list_table
@@ -331,9 +330,9 @@ bm_PlotVarImpBoxplot(bm.out = myBiomodModelOut1, group.by = c('expl.var', 'algo'
 bm_PlotVarImpBoxplot(bm.out = myBiomodModelOut1, group.by = c('algo', 'expl.var', 'run'))
 
 
-
+# aprimorar
 bm_PlotResponseCurves(bm.out = myBiomodModelOut1, 
-                      models.chosen = get_built_models(myBiomodModelOut1, algo = "RF"),
+                      models.chosen = get_built_models(myBiomodModelOut1)[c(1,3,5,7,9)], ####feito!
                       fixed.var = 'median')
 
 
@@ -343,7 +342,7 @@ bm_PlotResponseCurves(bm.out = myBiomodModelOut1,
 
 
 bm_PlotResponseCurves(bm.out = myBiomodModelOut1, 
-                      models.chosen = get_built_models(myBiomodModelOut1, algo = "RF")[1],
+                      models.chosen = get_built_models(myBiomodModelOut1, algo = "RF"),
                       fixed.var = 'median',
                       do.bivariate = TRUE)
 
@@ -357,7 +356,8 @@ myBiomodProj <- BIOMOD_Projection(bm.mod = myBiomodModelOut1,
                                   models.chosen = get_built_models(myBiomodModelOut1, algo = "RF"),
                                   metric.binary = 'ROC',
                                   metric.filter = 'ROC',
-                                  build.clamping.mask = TRUE)
+                                  build.clamping.mask = TRUE
+                                  )
 
 
 list.files("Tubastraea.coccinea./proj_current/")
