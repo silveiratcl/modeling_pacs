@@ -135,9 +135,9 @@ variables <- stack(variables)
 names(variables) <- c ('bat', 'velc', 'sst', 'd_cost', 'd_mar', 'd_traf', 'mhw', 'mcs')
 variables
 str(variables)
-plot(variables$d_traf)
-points(df[1:8,2:3], col = "red")
-points(df[9:25,2:3], col = "blue")
+#plot(variables$d_traf)
+#points(df[1:8,2:3], col = "red")
+#points(df[9:25,2:3], col = "blue")
 
 ## Extraindo os valores das camadas
 # valor de cada variavel pra cada coordenada
@@ -178,7 +178,6 @@ names(predictors1) <- c ( 'd_traf', 'mhw')
 predictors1
 
 
-
 ## Formatando os dados
 myBiomodData1 <- BIOMOD_FormatingData(resp.var = DataSpecies,
                                       expl.var = predictors1,
@@ -194,7 +193,7 @@ myBiomodOption
 
 ## Computando os modelos
 myBiomodModelOut1 <- BIOMOD_Modeling(myBiomodData1,
-                                     models = c('GLM','RF'), # duas metodologias "generalize linear model", usamos o logistico (minimo 0 e maximo 1)
+                                     models = c('RF'), # duas metodologias "generalize linear model", usamos o logistico (minimo 0 e maximo 1)
                                      bm.options = myBiomodOption,
                                      CV.strategy = 'random',
                                      CV.nb.rep = 5,
@@ -211,9 +210,26 @@ myBiomodModelOut1
 
 ## Obtendo a avaliação de todos os modelos
 get_evaluations(myBiomodModelOut1 )
+eval1 <- get_evaluations(myBiomodModelOut1)
+eval1
 get_variables_importance(myBiomodModelOut1)
 
+## Criando um df só para sensitividade e especificidade de cada rodada
+df_eval1 <- rbind(eval1[c(7:8)])
+df_eval1
 
+## Média e desvio padrão de cada modelo
+eval1 <- as_tibble(eval1)
+eval1
+
+eval1 %>%
+  select_if(is.numeric) %>% 
+  head()
+  
+group_by(eval1) %>%
+  mutate(mean = mean('sensitivity','specificity') %>%
+  select(run:validation) %>%
+  head()
 
 #Represent evaluation scores & variables importance
 bm_PlotEvalMean(bm.out = myBiomodModelOut1)
