@@ -5,8 +5,17 @@
 
 ################################################################################
 
+
+#https://rdrr.io/cran/biomod2/f/vignettes/examples_1_mainFunctions.Rmd
+
+
+# set woriking diretory as short as possible to avoid a bug in BIOMOD_EnsembleModeling()
+setwd("C:/Users/silve/OneDrive/Área de Trabalho/modeling_pacs_2024/modeling_pacs")
+
+
 #set to your path
 #setwd("C:/Users/silve/OneDrive/Documentos/Academico/POS-DOC_UFSC/@Karon Coral Sol/modelling/modeling_pacs_2024/modeling_pacs")
+
 
 ## Instalando os pacotes
 #install.packages("raster")
@@ -66,6 +75,7 @@ d_mar <- raster("./layers/d_mar_resampled.tif")
 d_traf <- raster("./layers/d_traf_resampled.tif")
 mhw <- raster("./layers/mhw_resampled.tif")
 mcs <- raster("./layers/mcs_resampled.tif")
+dist_inv <- raster("./layers/dist_inv.tiff")
 
 ## Filtro de proximidade
 filterByProximity <- function(xy, dist, mapUnits = F) {
@@ -130,9 +140,9 @@ df
 
 ## Criando um stack, ou seja, uma coleção de camadas raster, para as variáveis
 # Stack - empilhamento
-variables <- c(bat, velc, sst, d_cost, d_mar, d_traf, mhw, mcs)
+variables <- c(bat, velc, sst, d_cost, d_mar, d_traf, mhw, mcs, dist_inv)
 variables <- stack(variables)
-names(variables) <- c ('bat', 'velc', 'sst', 'd_cost', 'd_mar', 'd_traf', 'mhw', 'mcs')
+names(variables) <- c ('bat', 'velc', 'sst', 'd_cost', 'd_mar', 'd_traf', 'mhw', 'mcs', 'dist_inv')
 variables
 str(variables)
 #plot(variables$d_traf)
@@ -159,9 +169,9 @@ saveRDS(absvals, "./occ_abs_cs/absvals.Rds")
 
 ## Examinando as correlações entre as variáveis
 myData <- sdmdata
-describe(myData[,c(2:9)])
+describe(myData[,c(2:10)])
 
-pairs.panels(myData[,c(2:9)],pch='.')
+pairs.panels(myData[,c(2:10)],pch='.')
 lowerCor(myData[,c(2:9)])
 dev.off()
 
@@ -173,14 +183,18 @@ myRespXY <- df[,c("lon_dd", "lat_dd")]
 
 
 variables
-predictors1 <- stack(c(variables@layers[[6]], variables@layers[[7]]))  # 6, 7
-names(predictors1) <- c ( 'd_traf', 'mhw')
+
+predictors1 <- stack(c(variables@layers[[5]], variables@layers[[7]]))  # 5, 7
+names(predictors1) <- c ( 'd_mar', 'mhw')
 predictors1
 
 predictors2 <- stack(c(variables@layers[[5]], variables@layers[[8]]))  # 5, 8
 names(predictors2) <- c ( 'd_mar', 'mcs')
 predictors2
 
+predictors3 <- stack(c(variables@layers[[5]], variables@layers[[9]]))  # 5, 8
+names(predictors3) <- c ( 'd_mar', 'dist_inv')
+predictors3
 
 
 
@@ -195,6 +209,10 @@ myBiomodData2 <- BIOMOD_FormatingData(resp.var = DataSpecies,
                                       resp.xy = myRespXY,
                                       resp.name = myRespName)
 
+myBiomodData3 <- BIOMOD_FormatingData(resp.var = DataSpecies,
+                                      expl.var = predictors3,
+                                      resp.xy = myRespXY,
+                                      resp.name = myRespName)
 
 
 
@@ -206,13 +224,17 @@ myBiomodOption
 
 ## Computando os modelos
 myBiomodModelOut1 <- BIOMOD_Modeling(myBiomodData1,
+<<<<<<< HEAD
                                      models = c('RF'), # duas metodologias "generalize linear model", usamos o logistico (minimo 0 e maximo 1)
+=======
+                                     models = c('RF', 'GLM'), 
+>>>>>>> thiago_dev
                                      bm.options = myBiomodOption,
                                      CV.strategy = 'random',
                                      CV.nb.rep = 5,
                                      CV.perc = 0.7,
-                                     var.import=3,# numero de vezes que o modelo faz a analise da importancia da variavel atraves do sorteio
-                                     metric.eval = c('ROC', 'TSS'),# quanto o modelo acerta o 1 e o 0 > capacidade de acertar de fato os verdadeiros 1 e 0 #quanto maior a área da curva, indica que ta acertando bem                                     SaveObj = TRUE,
+                                     var.import=3,
+                                     metric.eval = c('ROC', 'TSS'),                                   
                                      scale.models = TRUE,
                                      #seed.val = 42,
                                      modeling.id = paste(myRespName,"Model1",sep=""))
@@ -221,7 +243,7 @@ myBiomodModelOut1 <- BIOMOD_Modeling(myBiomodData1,
 myBiomodModelOut1
 
 myBiomodModelOut2 <- BIOMOD_Modeling(myBiomodData2,
-                                     models = c('GLM','RF'),  
+                                     models = c('RF'),  
                                      bm.options = myBiomodOption,
                                      CV.strategy = 'random',
                                      CV.nb.rep = 5,
@@ -235,24 +257,40 @@ myBiomodModelOut2 <- BIOMOD_Modeling(myBiomodData2,
 myBiomodModelOut2
 
 
+myBiomodModelOut3 <- BIOMOD_Modeling(myBiomodData3,
+                                     models = c('RF'),  
+                                     bm.options = myBiomodOption,
+                                     CV.strategy = 'random',
+                                     CV.nb.rep = 5,
+                                     CV.perc = 0.7,
+                                     var.import=3,
+                                     metric.eval = c('ROC', 'TSS'),
+                                     scale.models = TRUE,
+                                     #seed.val = 42,
+                                     modeling.id = paste(myRespName,"Model1",sep=""))
 
+myBiomodModelOut3
 
 ## MOdel evaluation
 
 
 # eval object
 eval_myBiomodModelOut1<-as_tibble(get_evaluations(myBiomodModelOut1)) %>% 
-  mutate(model = paste("model_1"),# grouping model Hypotesys
-         preds = paste('d_traf_mhw')) # paste preds
+  mutate(model = paste("model 1"),# grouping model Hypotesys
+         preds = paste('d_traf + mhw')) # paste preds
 
 eval_myBiomodModelOut2<-as_tibble(get_evaluations(myBiomodModelOut2)) %>% 
   mutate(model = paste("model_2"),
-         preds = paste('d_mar_mcs'))
+         preds = paste('d_mar + mcs'))
 
+eval_myBiomodModelOut3<-as_tibble(get_evaluations(myBiomodModelOut3)) %>% 
+  mutate(model = paste("model_3"),
+         preds = paste('d_mar + dist_inv'))
  
 
 eval_list <- list(eval_myBiomodModelOut1,
-                  eval_myBiomodModelOut2)
+                  eval_myBiomodModelOut2,
+                  eval_myBiomodModelOut3)
 
 # Combining eval tables ordering by the higher values
 # of average ROC across the model runs 
@@ -261,15 +299,17 @@ eval_list_table <- eval_list %>%
   # bind tables by row
   bind_rows() %>% 
   # filtering by metric eval and algo
-  filter(metric.eval == "ROC", algo == "RF") %>% 
-  group_by(model, algo, metric.eval) %>%
+  filter(metric.eval == "ROC") %>% 
+  group_by(model, algo, metric.eval, preds) %>%
   summarise(avg_validation = mean(validation),
             sd_validation = sd(validation)) %>% 
   arrange(-avg_validation) %>% 
+   
   ungroup()
   
 eval_list_table
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 ## Obtendo a avaliação de todos os modelos
 get_evaluations(myBiomodModelOut1 )
@@ -296,105 +336,75 @@ group_by(eval1) %>%
   select(run:validation) %>%
   head()
 
+=======
+# Model One had the best performance 
+>>>>>>> thiago_dev
 #Represent evaluation scores & variables importance
+
 bm_PlotEvalMean(bm.out = myBiomodModelOut1)
-bm_PlotEvalBoxplot(bm.out = myBiomodModelOut1, group.by = c('algo', 'algo'))
-bm_PlotEvalBoxplot(bm.out = myBiomodModelOut1, group.by = c('algo', 'run'))
+
+# comparison between ROC and TSS
+bm_PlotEvalBoxplot(bm.out = myBiomodModelOut1, group.by = c('algo', 'algo')) # change to dot chart y 0-1
+
+
+# TSS and ROC By run
+bm_PlotEvalBoxplot(bm.out = myBiomodModelOut1, group.by = c('algo', 'run')) # change to dot chart y 0-1
+
+
+# Variable importance
 bm_PlotVarImpBoxplot(bm.out = myBiomodModelOut1, group.by = c('expl.var', 'algo', 'algo'))
+
+
+
+# just view, not for the report
 bm_PlotVarImpBoxplot(bm.out = myBiomodModelOut1, group.by = c('expl.var', 'algo', 'run'))
+
+# just view
 bm_PlotVarImpBoxplot(bm.out = myBiomodModelOut1, group.by = c('algo', 'expl.var', 'run'))
 
 
+
 bm_PlotResponseCurves(bm.out = myBiomodModelOut1, 
-                     models.chosen = get_built_models(myBiomodModelOut1)[c(1:3, 12:14)],
-                     fixed.var = 'median')
-bm_PlotResponseCurves(bm.out = myBiomodModelOut1, 
-                      models.chosen = get_built_models(myBiomodModelOut1)[c(1:3, 12:14)],
-                      fixed.var = 'min')
-bm_PlotResponseCurves(bm.out = myBiomodModelOut1, 
-                      models.chosen = get_built_models(myBiomodModelOut1)[2],
-                      fixed.var = 'median',
-                      do.bivariate = TRUE)
-
-
-
-
-
-
-
-###### RESOLVER aqui
-# Model ensemble models
-myBiomodEM <- BIOMOD_EnsembleModeling(bm.mod = myBiomodModelOut1,
-                                      models.chosen = 'all',
-                                      em.by = 'all',
-                                      em.algo = c('EMmean', 'EMcv', 'EMci', 'EMmedian', 'EMca', 'EMwmean'),
-                                      metric.select = c('TSS'),
-                                      metric.select.thresh = c(0.7),
-                                      metric.eval = c('TSS','ROC'),
-                                      var.import = 3,
-                                      EMci.alpha = 0.05,
-                                      EMwmean.decay = 'proportional')
-myBiomodEM
-
-# Get evaluation scores & variables importance
-get_evaluations(myBiomodEM)
-get_variables_importance(myBiomodEM)
-
-# Represent evaluation scores & variables importance
-bm_PlotEvalMean(bm.out = myBiomodEM, group.by = 'full.name')
-bm_PlotEvalBoxplot(bm.out = myBiomodEM, group.by = c('full.name', 'full.name'))
-bm_PlotVarImpBoxplot(bm.out = myBiomodEM, group.by = c('expl.var', 'full.name', 'full.name'))
-bm_PlotVarImpBoxplot(bm.out = myBiomodEM, group.by = c('expl.var', 'algo', 'merged.by.run'))
-bm_PlotVarImpBoxplot(bm.out = myBiomodEM, group.by = c('algo', 'expl.var', 'merged.by.run'))
-
-# Represent response curves
-bm_PlotResponseCurves(bm.out = myBiomodEM, 
-                      models.chosen = get_built_models(myBiomodEM)[c(1, 6, 7)],
+                      models.chosen = get_built_models(myBiomodModelOut1, algo = "RF"),
                       fixed.var = 'median')
-bm_PlotResponseCurves(bm.out = myBiomodEM, 
-                      models.chosen = get_built_models(myBiomodEM)[c(1, 6, 7)],
+
+
+bm_PlotResponseCurves(bm.out = myBiomodModelOut1, 
+                      models.chosen = get_built_models(myBiomodModelOut1, algo = "RF"),
                       fixed.var = 'min')
-bm_PlotResponseCurves(bm.out = myBiomodEM, 
-                      models.chosen = get_built_models(myBiomodEM)[7],
+
+
+bm_PlotResponseCurves(bm.out = myBiomodModelOut1, 
+                      models.chosen = get_built_models(myBiomodModelOut1, algo = "RF")[1],
                       fixed.var = 'median',
                       do.bivariate = TRUE)
 
 
 
+# Projection # no need ensemble because is just one model. The projection make 
 
-## Projetando sobre o globo nas condições atuais
-myBiomodProj <- BIOMOD_Projection(
-  bm.mod = myBiomodModelOut1,
-  new.env = predictors1,
-  proj.name = 'current',
-  selected.models = 'all',
-  binary.meth = 'ROC',
-  compress = 'xz',
-  build.clamping.mask = FALSE,
-  output.format = '.grd')
-myBiomodProj
+myBiomodProj <- BIOMOD_Projection(bm.mod = myBiomodModelOut1,
+                                  proj.name = 'Current',
+                                  new.env = predictors1,
+                                  models.chosen = get_built_models(myBiomodModelOut1, algo = "RF"),
+                                  metric.binary = 'ROC',
+                                  metric.filter = 'ROC',
+                                  build.clamping.mask = TRUE)
+
 
 list.files("Tubastraea.coccinea./proj_current/")
 
+
 plot(myBiomodProj)
-plot(myBiomodProj, str.grep = 'GLM')
 plot(myBiomodProj, str.grep = 'RF')
 
 
 
 #importing files
-EMcaByROC <- raster("./Tubastraea.coccinea/proj_current/individual_projections/Tubastraea.coccinea_EMcaByROC_mergedAlgo_mergedRun_mergedData.grd")
-EMcvByROC <- raster("./Tubastraea.coccinea/proj_current/individual_projections/Tubastraea.coccinea_EMcvByROC_mergedAlgo_mergedRun_mergedData.grd")
-EMmeanByROC <- raster("./Tubastraea.coccinea/proj_current/individual_projections/Tubastraea.coccinea_EMmeanByROC_mergedAlgo_mergedRun_mergedData.grd")
-EMmedianByROC <- raster("./Tubastraea.coccinea/proj_current/individual_projections/Tubastraea.coccinea_EMmedianByROC_mergedAlgo_mergedRun_mergedData.grd")
-EMwmeanByROC <- raster("./Tubastraea.coccinea/proj_current/individual_projections/Tubastraea.coccinea_EMwmeanByROC_mergedAlgo_mergedRun_mergedData.grd")
 
+ProjRF <- raster("./Tubastraea.coccinea/proj_current/proj_Current_Tubastraea.coccinea.tif")
+plot(ProjRF/1000) # customize plot
 
-#projecting ensembled model
-myBiomodEMProj <- stack(EMcaByROC, EMcvByROC, EMmeanByROC, EMmedianByROC, EMwmeanByROC)
-names(myBiomodEMProj) <- c('EMcaByROC', 'EMcvByROC', 'EMmeanByROC', 'EMmedianByROC', 'EMwmeanByROC')
-myBiomodEMProj
-plot(myBiomodEMProj)
 
 
 ################################################################################
