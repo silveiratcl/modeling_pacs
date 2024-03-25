@@ -282,7 +282,7 @@ myBiomodModelOut2 <- BIOMOD_Modeling(myBiomodData2,
                                      metric.eval = c('ROC', 'TSS'),
                                      scale.models = TRUE,
                                      #seed.val = 42,
-                                     modeling.id = paste(myRespName,"Model1",sep=""))
+                                     modeling.id = paste(myRespName,"Model2",sep="")) ### model 2
 
 myBiomodModelOut2
 
@@ -296,7 +296,7 @@ myBiomodModelOut3 <- BIOMOD_Modeling(myBiomodData3,
                                      metric.eval = c('ROC', 'TSS'),
                                      scale.models = TRUE,
                                      #seed.val = 42,
-                                     modeling.id = paste(myRespName,"Model1",sep=""))
+                                     modeling.id = paste(myRespName,"Model3",sep="")) ### model 3
 
 myBiomodModelOut3
 
@@ -395,6 +395,7 @@ eval_list_table
 eval_list_table2 <- eval_list_table[c(-2, -3, -6, -9, -10, -12),] # lines of GLM model
 eval_models_df <- data.table(do.call(cbind, eval_list_table2))
 
+<<<<<<< HEAD
 mytheme <- ttheme_default()
 mytheme$core$bg_params$fill <- c("light yellow", "light blue")
 grid.table(eval_models_df, theme = mytheme) 
@@ -405,11 +406,41 @@ get_variables_importance(eval_myBiomodModelOut4)
 
 #eval1 <- get_evaluations(myBiomodModelOut1)
 #eval1
+=======
+##########
+########## Aqui esta soprepondo o quie já foi feito para chegar em eval_list_table
+########## Reavalair  e discutir aqui
+## Obtendo a avaliação de todos os modelos
+get_evaluations(myBiomodModelOut1 )
+eval1 <- get_evaluations(myBiomodModelOut1)
+eval1
+get_variables_importance(myBiomodModelOut1)
+>>>>>>> 9b1ab4f80dc26f07011de4cdab194b2064c05364
 
 ## Criando um df só para sensitividade e especificidade de cada rodada
 #df_eval1 <- rbind(eval1[c(7:8)])
 #df_eval1
 
+<<<<<<< HEAD
+=======
+## Média e desvio padrão de cada modelo
+eval1 <- as_tibble(eval1) 
+eval1
+
+eval1 %>%
+  select_if(is.numeric) %>% 
+  head()
+  
+group_by(eval1) %>%
+  mutate(mean = mean('sensitivity','specificity') %>%
+  select(run:validation) %>%
+  head()
+
+############  
+############  
+  
+# Model One had the best performance 
+>>>>>>> 9b1ab4f80dc26f07011de4cdab194b2064c05364
 
 #Represent evaluation scores & variables importance
 bm_PlotEvalMean(bm.out = myBiomodModelOut4)
