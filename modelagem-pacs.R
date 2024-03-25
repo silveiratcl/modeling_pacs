@@ -30,6 +30,9 @@ setwd("C:/Users/silve/OneDrive/Área de Trabalho/modeling_pacs_2024/modeling_pac
 #install.packages("dismo")
 #install.packages("tidyterra")
 #install.packages("ggtext")
+#install.packages("data.table")
+#install.packages("gridExtra")
+#install.packages("tidyverse")
 
 
 ## Carregamento dos pacotes
@@ -49,6 +52,10 @@ library(tidyr)
 library(dismo)
 library(tidyterra)
 library(ggtext)
+library(data.table)
+library(gridExtra)
+library(tidyverse)
+
 
 ## Carregando os dados de ocorrência e ausência
 dfocc <- read.table("./occ_abs_cs/occ_abs_model_edited_occ.csv", header = T, sep = ",", dec = ".")
@@ -172,7 +179,7 @@ myData <- sdmdata
 describe(myData[,c(2:10)])
 
 pairs.panels(myData[,c(2:10)],pch='.')
-lowerCor(myData[,c(2:9)])
+lowerCor(myData[,c(2:10)])
 dev.off()
 
 
@@ -184,16 +191,28 @@ myRespXY <- df[,c("lon_dd", "lat_dd")]
 
 variables
 
-predictors1 <- stack(c(variables@layers[[5]], variables@layers[[7]]))  # 5, 7
-names(predictors1) <- c ( 'd_mar', 'mhw')
+predictors1 <- stack(c(variables@layers[[5]], variables@layers[[7]]))  
+names(predictors1) <- c( 'd_mar', 'mhw')
 predictors1
 
-predictors2 <- stack(c(variables@layers[[5]], variables@layers[[8]]))  # 5, 8
-names(predictors2) <- c ( 'd_mar', 'mcs')
+predictors2 <- stack(c(variables@layers[[5]], variables@layers[[8]]))  
+names(predictors2) <- c( 'd_mar', 'mcs')
 predictors2
 
-predictors3 <- stack(c(variables@layers[[5]], variables@layers[[9]]))  # 5, 8
-names(predictors3) <- c ( 'd_mar', 'dist_inv')
+predictors3 <- stack(c(variables@layers[[5]], variables@layers[[9]]))  
+names(predictors3) <- c( 'd_mar', 'dist_inv')
+predictors3
+
+predictors4 <- stack(c(variables@layers[[5]], variables@layers[[3]]))  
+names(predictors3) <- c( 'd_mar', 'sst')
+predictors3
+
+predictors5 <- stack(c(variables@layers[[2]], variables@layers[[9]]))  
+names(predictors3) <- c( 'velc', 'dist_inv')
+predictors3
+
+predictors6 <- stack(c(variables@layers[[6]], variables@layers[[7]]))  
+names(predictors3) <- c( 'd_traf', 'mhw')
 predictors3
 
 
@@ -211,6 +230,21 @@ myBiomodData2 <- BIOMOD_FormatingData(resp.var = DataSpecies,
 
 myBiomodData3 <- BIOMOD_FormatingData(resp.var = DataSpecies,
                                       expl.var = predictors3,
+                                      resp.xy = myRespXY,
+                                      resp.name = myRespName)
+
+myBiomodData4 <- BIOMOD_FormatingData(resp.var = DataSpecies,
+                                      expl.var = predictors4,
+                                      resp.xy = myRespXY,
+                                      resp.name = myRespName)
+
+myBiomodData5 <- BIOMOD_FormatingData(resp.var = DataSpecies,
+                                      expl.var = predictors5,
+                                      resp.xy = myRespXY,
+                                      resp.name = myRespName)
+
+myBiomodData6 <- BIOMOD_FormatingData(resp.var = DataSpecies,
+                                      expl.var = predictors6,
                                       resp.xy = myRespXY,
                                       resp.name = myRespName)
 
@@ -252,7 +286,6 @@ myBiomodModelOut2 <- BIOMOD_Modeling(myBiomodData2,
 
 myBiomodModelOut2
 
-
 myBiomodModelOut3 <- BIOMOD_Modeling(myBiomodData3,
                                      models = c('RF', 'GLM'),  
                                      bm.options = myBiomodOption,
@@ -267,13 +300,55 @@ myBiomodModelOut3 <- BIOMOD_Modeling(myBiomodData3,
 
 myBiomodModelOut3
 
+myBiomodModelOut4 <- BIOMOD_Modeling(myBiomodData4,
+                                     models = c('RF','GLM'), 
+                                     bm.options = myBiomodOption,
+                                     CV.strategy = 'random',
+                                     CV.nb.rep = 5,
+                                     CV.perc = 0.7,
+                                     var.import=3,
+                                     metric.eval = c('ROC', 'TSS'),                                   
+                                     scale.models = TRUE,
+                                     #seed.val = 42,
+                                     modeling.id = paste(myRespName,"Model1",sep=""))
+
+myBiomodModelOut4
+
+myBiomodModelOut5 <- BIOMOD_Modeling(myBiomodData5,
+                                     models = c('RF','GLM'), 
+                                     bm.options = myBiomodOption,
+                                     CV.strategy = 'random',
+                                     CV.nb.rep = 5,
+                                     CV.perc = 0.7,
+                                     var.import=3,
+                                     metric.eval = c('ROC', 'TSS'),                                   
+                                     scale.models = TRUE,
+                                     #seed.val = 42,
+                                     modeling.id = paste(myRespName,"Model1",sep=""))
+
+myBiomodModelOut5
+
+myBiomodModelOut6 <- BIOMOD_Modeling(myBiomodData6,
+                                     models = c('RF','GLM'), 
+                                     bm.options = myBiomodOption,
+                                     CV.strategy = 'random',
+                                     CV.nb.rep = 5,
+                                     CV.perc = 0.7,
+                                     var.import=3,
+                                     metric.eval = c('ROC', 'TSS'),                                   
+                                     scale.models = TRUE,
+                                     #seed.val = 42,
+                                     modeling.id = paste(myRespName,"Model1",sep=""))
+
+myBiomodModelOut6
+
 ## MOdel evaluation
 
 
 # eval object
 eval_myBiomodModelOut1<-as_tibble(get_evaluations(myBiomodModelOut1)) %>% 
-  mutate(model = paste("model 1"),# grouping model Hypotesys
-         preds = paste('d_traf + mhw')) # paste preds
+  mutate(model = paste("model_1"),# grouping model Hypotesys
+         preds = paste('d_mar + mhw')) # paste preds
 
 eval_myBiomodModelOut2<-as_tibble(get_evaluations(myBiomodModelOut2)) %>% 
   mutate(model = paste("model_2"),
@@ -282,15 +357,29 @@ eval_myBiomodModelOut2<-as_tibble(get_evaluations(myBiomodModelOut2)) %>%
 eval_myBiomodModelOut3<-as_tibble(get_evaluations(myBiomodModelOut3)) %>% 
   mutate(model = paste("model_3"),
          preds = paste('d_mar + dist_inv'))
+
+eval_myBiomodModelOut4<-as_tibble(get_evaluations(myBiomodModelOut4)) %>% 
+  mutate(model = paste("model_4"),
+         preds = paste('d_mar + sst'))
+
+eval_myBiomodModelOut5<-as_tibble(get_evaluations(myBiomodModelOut5)) %>% 
+  mutate(model = paste("model_5"),
+         preds = paste('velc + dist_inv'))
+
+eval_myBiomodModelOut6<-as_tibble(get_evaluations(myBiomodModelOut6)) %>% 
+  mutate(model = paste("model_6"),
+         preds = paste('d_traf + mhw'))
  
 
 eval_list <- list(eval_myBiomodModelOut1,
                   eval_myBiomodModelOut2,
-                  eval_myBiomodModelOut3)
+                  eval_myBiomodModelOut3,
+                  eval_myBiomodModelOut4,
+                  eval_myBiomodModelOut5,
+                  eval_myBiomodModelOut6)
 
 # Combining eval tables ordering by the higher values
 # of average ROC across the model runs 
-library(tidyverse)
 eval_list_table <- eval_list %>% 
   # bind tables by row
   bind_rows() %>% 
@@ -303,72 +392,58 @@ eval_list_table <- eval_list %>%
   ungroup()
   
 eval_list_table
+eval_list_table2 <- eval_list_table[c(-2, -3, -6, -9, -10, -12),] # lines of GLM model
+eval_models_df <- data.table(do.call(cbind, eval_list_table2))
 
-## Obtendo a avaliação de todos os modelos
-get_evaluations(myBiomodModelOut1 )
-eval1 <- get_evaluations(myBiomodModelOut1)
-eval1
-get_variables_importance(myBiomodModelOut1)
+mytheme <- ttheme_default()
+mytheme$core$bg_params$fill <- c("light yellow", "light blue")
+grid.table(eval_models_df, theme = mytheme) 
+
+
+## Obtendo a importância das variáveis
+get_variables_importance(eval_myBiomodModelOut4)
+
+#eval1 <- get_evaluations(myBiomodModelOut1)
+#eval1
 
 ## Criando um df só para sensitividade e especificidade de cada rodada
-df_eval1 <- rbind(eval1[c(7:8)])
-df_eval1
+#df_eval1 <- rbind(eval1[c(7:8)])
+#df_eval1
 
-## Média e desvio padrão de cada modelo
-eval1 <- as_tibble(eval1)
-eval1
-
-eval1 %>%
-  select_if(is.numeric) %>% 
-  head()
-  
-group_by(eval1) %>%
-  mutate(mean = mean('sensitivity','specificity') %>%
-  select(run:validation) %>%
-  head()
-
-# Model One had the best performance 
 
 #Represent evaluation scores & variables importance
-
-bm_PlotEvalMean(bm.out = myBiomodModelOut1)
+bm_PlotEvalMean(bm.out = myBiomodModelOut4)
 
 # comparison between ROC and TSS
-bm_PlotEvalBoxplot(bm.out = myBiomodModelOut1, group.by = c('algo', 'algo')) # change to dot chart y 0-1
-
+bm_PlotEvalBoxplot(bm.out = myBiomodModelOut4, group.by = c('algo', 'algo')) # change to dot chart y 0-1
 
 # TSS and ROC By run
-bm_PlotEvalBoxplot(bm.out = myBiomodModelOut1, group.by = c('algo', 'run')) # change to dot chart y 0-1
+bm_PlotEvalBoxplot(bm.out = myBiomodModelOut4, group.by = c('algo', 'run')) # change to dot chart y 0-1
 
 
 # Variable importance
-bm_PlotVarImpBoxplot(bm.out = myBiomodModelOut1, group.by = c('expl.var', 'algo', 'algo'))
-
+bm_PlotVarImpBoxplot(bm.out = myBiomodModelOut4, group.by = c('expl.var', 'algo', 'algo'))
 
 
 # just view, not for the report
-bm_PlotVarImpBoxplot(bm.out = myBiomodModelOut1, group.by = c('expl.var', 'algo', 'run'))
+bm_PlotVarImpBoxplot(bm.out = myBiomodModelOut4, group.by = c('expl.var', 'algo', 'run'))
 
 # just view
-bm_PlotVarImpBoxplot(bm.out = myBiomodModelOut1, group.by = c('algo', 'expl.var', 'run'))
+bm_PlotVarImpBoxplot(bm.out = myBiomodModelOut4, group.by = c('algo', 'expl.var', 'run'))
 
 
 # aprimorar
-bm_PlotResponseCurves(bm.out = myBiomodModelOut1, 
-                      models.chosen = get_built_models(myBiomodModelOut1)[c(1,3,5,7,9)], ####feito!
+bm_PlotResponseCurves(bm.out = myBiomodModelOut4, 
+                      models.chosen = get_built_models(myBiomodModelOut4)[c(1,3,5,7,9)], ####feito!
                       fixed.var = 'median')
 
-mods <- get_built_models(myBiomodModelOut, run = 'RUN1', 'RF')
-bm_PlotResponseCurves(bm.out = myBiomodModelOut, 
-#                       models.chosen = mods,
-#                       fixed.var = 'median')
 
-bm_PlotResponseCurves(bm.out = myBiomodModelOut1, 
+bm_PlotResponseCurves(bm.out = myBiomodModelOut4, 
                       models.chosen = get_built_models(myBiomodModelOut1, algo = "RF"),
                       fixed.var = 'min')
 
 
-bm_PlotResponseCurves(bm.out = myBiomodModelOut1, 
+bm_PlotResponseCurves(bm.out = myBiomodModelOut4, 
                       models.chosen = get_built_models(myBiomodModelOut1, algo = "RF"),
                       fixed.var = 'median',
                       do.bivariate = TRUE)
@@ -377,9 +452,9 @@ bm_PlotResponseCurves(bm.out = myBiomodModelOut1,
 
 # Projection # no need ensemble because is just one model. The projection make 
 
-myBiomodProj <- BIOMOD_Projection(bm.mod = myBiomodModelOut1,
+myBiomodProj <- BIOMOD_Projection(bm.mod = myBiomodModelOut3,
                                   proj.name = 'Current',
-                                  new.env = predictors1,
+                                  new.env = predictors3,
                                   models.chosen = get_built_models(myBiomodModelOut1, algo = "RF"),
                                   metric.binary = 'ROC',
                                   metric.filter = 'ROC',
@@ -400,6 +475,6 @@ plot(myBiomodProj, str.grep = 'RF')
 ProjRF <- raster("./Tubastraea.coccinea/proj_current/proj_Current_Tubastraea.coccinea.tif")
 plot(ProjRF/1000) # customize plot
 
-
+sessionInfo()
 
 ################################################################################
