@@ -77,6 +77,22 @@ mhw <- raster("./layers/mhw_resampled.tif")
 mcs <- raster("./layers/mcs_resampled.tif")
 dist_inv <- raster("./layers/dist_inv.tiff")
 
+
+plot(bat) 
+plot(velc) 
+plot(sst) 
+plot(d_cost) 
+plot(d_mar) 
+plot(d_traf) 
+plot(mhw)  
+plot(mcs) 
+plot(dist_inv) 
+
+
+
+
+
+
 ## Filtro de proximidade
 filterByProximity <- function(xy, dist, mapUnits = F) {
   if (!mapUnits) {
@@ -145,7 +161,7 @@ variables <- stack(variables)
 names(variables) <- c ('bat', 'velc', 'sst', 'd_cost', 'd_mar', 'd_traf', 'mhw', 'mcs', 'dist_inv')
 variables
 str(variables)
-plot(variables$d_traf)
+plot(variables$mhw)
 points(df[1:8,2:3], col = "red")
 points(df[9:25,2:3], col = "blue")
 
@@ -308,7 +324,7 @@ eval_list_table
 # Model One had the best performance 
 #Represent evaluation scores & variables importance
 
-bm_PlotEvalMean(bm.out = myBiomodModelOut1)
+bm_PlotEvalMean(bm.out = myBiomodModelOut3)
 
 # comparison between ROC and TSS
 bm_PlotEvalBoxplot(bm.out = myBiomodModelOut1, group.by = c('algo', 'algo')) # change to dot chart y 0-1
@@ -331,8 +347,8 @@ bm_PlotVarImpBoxplot(bm.out = myBiomodModelOut1, group.by = c('algo', 'expl.var'
 
 
 # aprimorar
-bm_PlotResponseCurves(bm.out = myBiomodModelOut1, 
-                      models.chosen = get_built_models(myBiomodModelOut1)[c(1,3,5,7,9)], ####feito!
+bm_PlotResponseCurves(bm.out = myBiomodModelOut3, 
+                      models.chosen = get_built_models(myBiomodModelOut3)[c(1,3,5,7,9)], ####feito!
                       fixed.var = 'median')
 
 
