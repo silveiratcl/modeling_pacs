@@ -1079,31 +1079,26 @@ mytheme <- ttheme_default(base_size = 10, base_colour = 'black', base_family = "
 grid.table(eval_models_df[1:10,],  theme = mytheme)
 
 ## Obtendo a importância das variáveis
-varimp_table <- get_variables_importance(myBiomodModelOut5) %>%
+get_variables_importance(myBiomodModelOut19)%>%
   filter(algo == "RF") %>%
   group_by(full.name, run, algo, expl.var, var.imp) %>%
   summarise(avg_var.imp = mean(var.imp)) %>%
   arrange(-avg_var.imp) %>%
   ungroup()
-  
-varimp_df <- data.table(do.call(cbind,varimp_table)
-varimp_df 
-                                               
-grid.table(varimp_table, theme = mytheme)
                                              
 # Model that had the best performance 
 
 #Represent evaluation scores & variables importance
-bm_PlotEvalMean(bm.out = myBiomodModelOut5)
+bm_PlotEvalMean(bm.out = myBiomodModelOut19)
 
 # comparison between ROC and TSS
 #bm_PlotEvalBoxplot(bm.out = myBiomodModelOut5, group.by = c('algo', 'algo')) # change to dot chart y 0-1
 
 # TSS and ROC By run
-bm_PlotEvalBoxplot(bm.out = myBiomodModelOut5, group.by = c('algo', 'run')) # change to dot chart y 0-1
+bm_PlotEvalBoxplot(bm.out = myBiomodModelOut19,group.by = c('algo', 'run')) # change to dot chart y 0-1
 
 # Variable importance
-bm_PlotVarImpBoxplot(bm.out = myBiomodModelOut5, group.by = c('expl.var', 'algo', 'algo'))
+bm_PlotVarImpBoxplot(bm.out = myBiomodModelOut19,group.by = c('expl.var', 'algo', 'algo'))
 
 
 # just view, not for the report
@@ -1114,28 +1109,26 @@ bm_PlotVarImpBoxplot(bm.out = myBiomodModelOut1, group.by = c('algo', 'expl.var'
 
 
 # aprimorar
-bm_PlotResponseCurves(bm.out = myBiomodModelOut5, 
+bm_PlotResponseCurves(bm.out = myBiomodModelOut5,
                       models.chosen = get_built_models(myBiomodModelOut5)[c(1,3,5,7,9,11,13,15,17,19,21,23,25,27,29,31,33,35,37,39)],
                       fixed.var = 'median')
-
 
 bm_PlotResponseCurves(bm.out = myBiomodModelOut5, 
                       models.chosen = get_built_models(myBiomodModelOut5, algo = "RF"),
                       fixed.var = 'min')
 
 
-bm_PlotResponseCurves(bm.out = myBiomodModelOut5,
-                      models.chosen = get_built_models(myBiomodModelOut5, algo = "RF"),
+bm_PlotResponseCurves(bm.out = myBiomodModelOut19,
+                      models.chosen = get_built_models(myBiomodModelOut19,algo = "RF"),
                       fixed.var = 'median',
                       do.bivariate = TRUE)
-
 
 # Projection # no need ensemble because is just one model. The projection make 
 
 myBiomodProj <- BIOMOD_Projection(bm.mod = myBiomodModelOut5,
                                   proj.name = 'Current',
                                   new.env = predictors5,
-                                  models.chosen = get_built_models(myBiomodModelOut5, algo = "RF"),
+                                  models.chosen = get_built_models(myBiomodModelOut5,algo = "RF"),
                                   metric.binary = 'TSS',
                                   metric.filter = 'TSS',
                                   build.clamping.mask = TRUE)
