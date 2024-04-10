@@ -349,18 +349,17 @@ bm_PlotVarImpBoxplot(bm.out = myBiomodModelOut1, group.by = c('algo', 'expl.var'
 # aprimorar
 bm_PlotResponseCurves(bm.out = myBiomodModelOut3, 
                       models.chosen = get_built_models(myBiomodModelOut3)[c(1,3,5,7,9)], ####feito!
-                      fixed.var = 'median')
+                      fixed.var = 'mean')
 
 
-bm_PlotResponseCurves(bm.out = myBiomodModelOut1, 
-                      models.chosen = get_built_models(myBiomodModelOut1, algo = "RF"),
-                      fixed.var = 'min')
+bm_PlotResponseCurves(bm.out = myBiomodModelOut3, 
+                      models.chosen = get_built_models(myBiomodModelOut3)[c(1,3,5,7,9)],
+                      fixed.var = 'mean')
 
 
-bm_PlotResponseCurves(bm.out = myBiomodModelOut1, 
-                      models.chosen = get_built_models(myBiomodModelOut1, algo = "RF"),
-                      fixed.var = 'median',
-                      do.bivariate = TRUE)
+bm_PlotResponseCurves(bm.out = myBiomodModelOut3, 
+                      models.chosen = get_built_models(myBiomodModelOut3)[c(1,3,5,7,9)],
+                      fixed.var = 'mean')
 
 
 
