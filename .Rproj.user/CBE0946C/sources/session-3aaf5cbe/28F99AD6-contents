@@ -27,7 +27,7 @@ eval_list_table
 myBiomodModelOut5
 
 bm_PlotResponseCurves(bm.out = myBiomodModelOut5, 
-                      models.chosen = get_built_models(myBiomodModelOut3)[c(1,3,5,7,9)], ####feito!
+                      models.chosen = get_built_models(myBiomodModelOut5)[c(1,3,5,7,9)], ####feito!
                       fixed.var = 'mean')
 
 
