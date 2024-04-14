@@ -169,15 +169,15 @@ variables <- stack(variables)
 names(variables) <- c ('bat', 'velc', 'sst', 'mhw', 'mcs', 'dist_inv', 'd_cost', 'd_mar', 'd_traf')
 variables
 str(variables)
-<<<<<<< HEAD
+
 plot(variables$mhw)
 points(df[1:8,2:3], col = "red")
 points(df[9:25,2:3], col = "blue")
-=======
+
 #plot(variables$d_traf)
 #points(df[1:8,2:3], col = "red")
 #points(df[9:25,2:3], col = "blue")
->>>>>>> vic_dev
+
 
 ## Extraindo os valores das camadas
 # valor de cada variavel pra cada coordenada
@@ -915,6 +915,7 @@ myBiomodModelOut31 <- BIOMOD_Modeling(myBiomodData31,
 myBiomodModelOut31
 
 
+
 ## MOdel evaluation
 
 
@@ -1088,44 +1089,62 @@ eval_list_table <- eval_list %>%
             sd_validation = round(sd(validation), digits = 3),
             avg_sensitivity = round(mean(sensitivity), digits = 3),
             avg_specificity = round(mean(specificity), digits = 3),
-            avg_TSS = round((mean(sensitivity) + mean(specificity) - 1), digits = 3)) %>% 
+            avg_TSS = round((mean(sensitivity) + mean(specificity) - 100), digits = 3)) %>% 
   arrange(-avg_validation) %>% 
   ungroup()
   
-eval_list_table
+eval_list_table 
+
 eval_models_df <- data.table(do.call(cbind, eval_list_table))
+eval_models_df <- eval_models_df[, c(4,5,8,9)] 
+names(eval_models_df) <- c("Modelo", "Média Validação", "D.P. Validação", "TSS Médio")
 
+mytheme <- ttheme_default(base_size = 10, 
+                          base_colour = '#043480', 
+                          base_family = "Arial",
+                          parse = FALSE, 
+                          padding = unit(c(3, 3), "mm",))
 
-mytheme <- ttheme_default(base_size = 10, base_colour = 'black', base_family = "TT Times New Roman",
-                          parse = FALSE, padding = unit(c(3, 3), "mm",))
-grid.table(eval_models_df[1:10,],  theme = mytheme)
+grid.table(eval_models_df[1:10, ],  theme = mytheme)
 
 ## Obtendo a importância das variáveis
-get_variables_importance(myBiomodModelOut19)%>%
+get_variables_importance(myBiomodModelOut5)%>%
   filter(algo == "RF") %>%
   group_by(full.name, run, algo, expl.var, var.imp) %>%
   summarise(avg_var.imp = mean(var.imp)) %>%
   arrange(-avg_var.imp) %>%
   ungroup()
-                                             
+
+var_imp_model5 <- get_variables_importance(myBiomodModelOut5)
+
+p <- var_imp_model5 %>% 
+  filter(algo == "RF") %>% 
+  
+  ggplot(aes(x = expl.var, 
+             y = var.imp, 
+             fill = algo )) +
+            geom_boxplot() +
+            facet_wrap(algo, scales = "free_x") +  
+            scale_y_continuous(breaks = seq(0, 1, 0.1), labels = paste0(seq(0, 100, 10), "%")) + 
+            xlab("") + 
+            ylab("") + 
+            theme(legend.title = element_blank(),
+                  legend.key = element_rect(fill = "white"), 
+                  axis.text.x = element_text(angle = 45, hjust = 1))
+####################################################################################
+
+
 # Model that had the best performance 
 
 #Represent evaluation scores & variables importance
-<<<<<<< HEAD
 
-bm_PlotEvalMean(bm.out = myBiomodModelOut3)
-=======
-bm_PlotEvalMean(bm.out = myBiomodModelOut19)
->>>>>>> vic_dev
+bm_PlotEvalMean(bm.out = myBiomodModelOut5)
 
-# comparison between ROC and TSS
-#bm_PlotEvalBoxplot(bm.out = myBiomodModelOut5, group.by = c('algo', 'algo')) # change to dot chart y 0-1
-
-# TSS and ROC By run
-bm_PlotEvalBoxplot(bm.out = myBiomodModelOut19,group.by = c('algo', 'run')) # change to dot chart y 0-1
 
 # Variable importance
-bm_PlotVarImpBoxplot(bm.out = myBiomodModelOut19,group.by = c('expl.var', 'algo', 'algo'))
+bm_PlotVarImpBoxplot(bm.out = myBiomodModelOut5,group.by = c('expl.var', 'algo', 'algo'))
+
+
 
 
 # just view, not for the report
@@ -1136,7 +1155,7 @@ bm_PlotVarImpBoxplot(bm.out = myBiomodModelOut1, group.by = c('algo', 'expl.var'
 
 
 # aprimorar
-<<<<<<< HEAD
+
 bm_PlotResponseCurves(bm.out = myBiomodModelOut3, 
                       models.chosen = get_built_models(myBiomodModelOut3)[c(1,3,5,7,9)], ####feito!
                       fixed.var = 'mean')
@@ -1150,7 +1169,7 @@ bm_PlotResponseCurves(bm.out = myBiomodModelOut3,
 bm_PlotResponseCurves(bm.out = myBiomodModelOut3, 
                       models.chosen = get_built_models(myBiomodModelOut3)[c(1,3,5,7,9)],
                       fixed.var = 'mean')
-=======
+
 bm_PlotResponseCurves(bm.out = myBiomodModelOut5,
                       models.chosen = get_built_models(myBiomodModelOut5)[c(1,3,5,7,9,11,13,15,17,19,21,23,25,27,29,31,33,35,37,39)],
                       fixed.var = 'median')
@@ -1164,7 +1183,7 @@ bm_PlotResponseCurves(bm.out = myBiomodModelOut19,
                       models.chosen = get_built_models(myBiomodModelOut19,algo = "RF"),
                       fixed.var = 'median',
                       do.bivariate = TRUE)
->>>>>>> vic_dev
+
 
 # Projection # no need ensemble because is just one model. The projection make 
 
