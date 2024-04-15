@@ -1095,7 +1095,7 @@ eval_list_table <- eval_list %>%
   
 eval_list_table 
 
-eval_models_df <- data.table(do.call(cbind, eval_list_table))
+ eval_models_df <- data.table(do.call(cbind, eval_list_table))
 eval_models_df <- eval_models_df[, c(4,5,8,9)] 
 names(eval_models_df) <- c("Modelo", "Média Validação", "D.P. Validação", "TSS Médio")
 
@@ -1107,82 +1107,203 @@ mytheme <- ttheme_default(base_size = 10,
 
 grid.table(eval_models_df[1:10, ],  theme = mytheme)
 
-## Obtendo a importância das variáveis
-get_variables_importance(myBiomodModelOut5)%>%
-  filter(algo == "RF") %>%
-  group_by(full.name, run, algo, expl.var, var.imp) %>%
-  summarise(avg_var.imp = mean(var.imp)) %>%
-  arrange(-avg_var.imp) %>%
-  ungroup()
 
+### Figures
+
+# Variable Importance
 var_imp_model5 <- get_variables_importance(myBiomodModelOut5)
 
-p <- var_imp_model5 %>% 
+# boxplot
+var_imp_boxplot = var_imp_model5 %>% 
   filter(algo == "RF") %>% 
-  
   ggplot(aes(x = expl.var, 
-             y = var.imp, 
-             fill = algo )) +
-            geom_boxplot() +
-            facet_wrap(algo, scales = "free_x") +  
-            scale_y_continuous(breaks = seq(0, 1, 0.1), labels = paste0(seq(0, 100, 10), "%")) + 
-            xlab("") + 
-            ylab("") + 
-            theme(legend.title = element_blank(),
-                  legend.key = element_rect(fill = "white"), 
-                  axis.text.x = element_text(angle = 45, hjust = 1))
+             y = var.imp,
+             fill = expl.var
+              )) +
+  geom_boxplot() +
+  scale_fill_manual(values=c('#536e99', '#db6d10' )) +
+  scale_y_continuous(breaks = seq(0, 1, 0.1), 
+                     labels = paste0(seq(0, 100, 10), "%"),
+                     expand = c(0, 0)) + 
+  scale_x_discrete(labels = c("Batimetria (m)", "Distância primeiros focos (m)" )) +
+  ggtitle("Importância das Variáveis") +
+  xlab("") + 
+  ylab("") + 
+  theme(
+    panel.background = element_blank(),
+    axis.ticks.y = element_line(colour = "grey",
+                                linewidth = 0.8, linetype = "solid"),
+    axis.line.y = element_line(colour = "grey",
+                               linewidth = 0.8, linetype = "solid"),
+    axis.text.x = element_text(size = 13,  color = "#284b80" ),
+    axis.text.y = element_text(size = 15,  color = "grey" ),
+    axis.ticks.x = element_blank(),
+    legend.title = element_blank(),
+    legend.position="none",
+    legend.key = element_rect(fill = "white"),
+    plot.title = element_text(hjust = 0.5, size = 18, color ="#284b80" )
+    ) 
+    
+# Save
+var_imp_boxplot
+ggsave("pacs_figs/var_imp_boxplot.png", width = 10, height = 5, dpi = 300)
+
+
+################################################################################
+
+####
+  scale_x_discrete(labels = c('Matacões e Paredões','Tocas e Fendas','Grutas', "Lages", "Rochas P e M")) +
+  geom_boxplot(lwd = 0.2) +
+  scale_y_continuous(position="left", n.breaks = 10, expand = c(0, 0.05)) +
+  ggtitle("Índice de Abragência Relativa das Geomorfologias (IAR GEO)") +
+  xlab("") +
+  labs(y = "IAR GEO") +
+  #geom_jitter(color="black", size=0.2, alpha=0.5) +
+  theme(
+    panel.background = element_blank(),
+    axis.ticks.y = element_line(colour = "grey",
+                                linewidth = 0.8, linetype = "solid"),
+    axis.line.y = element_line(colour = "grey",
+                               linewidth = 0.8, linetype = "solid"),
+    axis.text.x = element_text(size = 13,  color = "#284b80" ),
+    axis.text.y = element_text(size = 15,  color = "grey" ),
+    axis.title.y = element_text(size = 14,  color = "#284b80" ),
+    legend.position="none",
+    axis.ticks.x = element_blank(), 
+    plot.title = element_text(hjust = 0.5, size = 18, color ="#284b80" )
+  )
+
+
+bp_all_local
+ggsave("plots/geo_local.png", width = 10, height = 5, dpi = 300)
+
 ####################################################################################
 
 
-# Model that had the best performance 
+# Response curve
 
-#Represent evaluation scores & variables importance
-
-bm_PlotEvalMean(bm.out = myBiomodModelOut5)
-
-
-# Variable importance
-bm_PlotVarImpBoxplot(bm.out = myBiomodModelOut5,group.by = c('expl.var', 'algo', 'algo'))
-
-
-
-
-# just view, not for the report
-bm_PlotVarImpBoxplot(bm.out = myBiomodModelOut1, group.by = c('expl.var', 'algo', 'run'))
-
-# just view
-bm_PlotVarImpBoxplot(bm.out = myBiomodModelOut1, group.by = c('algo', 'expl.var', 'run'))
-
-
-# aprimorar
-
-bm_PlotResponseCurves(bm.out = myBiomodModelOut3, 
-                      models.chosen = get_built_models(myBiomodModelOut3)[c(1,3,5,7,9)], ####feito!
-                      fixed.var = 'mean')
-
-
-bm_PlotResponseCurves(bm.out = myBiomodModelOut3, 
-                      models.chosen = get_built_models(myBiomodModelOut3)[c(1,3,5,7,9)],
-                      fixed.var = 'mean')
-
-
-bm_PlotResponseCurves(bm.out = myBiomodModelOut3, 
-                      models.chosen = get_built_models(myBiomodModelOut3)[c(1,3,5,7,9)],
-                      fixed.var = 'mean')
-
-bm_PlotResponseCurves(bm.out = myBiomodModelOut5,
+# get data from bm_PlotResponseCurves
+response_curves<- bm_PlotResponseCurves(bm.out = myBiomodModelOut5,
                       models.chosen = get_built_models(myBiomodModelOut5)[c(1,3,5,7,9,11,13,15,17,19,21,23,25,27,29,31,33,35,37,39)],
                       fixed.var = 'median')
 
-bm_PlotResponseCurves(bm.out = myBiomodModelOut5, 
-                      models.chosen = get_built_models(myBiomodModelOut5, algo = "RF"),
-                      fixed.var = 'min')
+
+response_curves_data <- response_curves$plot$data
+
+library("viridis")
+palette <- viridis_pal(option = "viridis")(20)
+
+# plot
+response_bat = response_curves_data %>%
+  filter(expl.name == "bat") %>% 
+  ggplot( aes(x = expl.val, y = pred.val, 
+                     color = pred.name)) +
+  geom_line(size = 1) +
+  scale_color_manual(values = palette) +
+  scale_y_continuous(position="left", n.breaks = 10, expand = c(0, 0), limits = c(0,1)) +
+
+  labs(y = "Prediction", x = "Batimetria (m)") +
+  theme(
+    panel.background = element_blank(),
+    axis.ticks.y = element_line(colour = "grey",
+                                linewidth = 0.8, linetype = "solid"),
+    axis.line.y = element_line(colour = "grey",
+                                linewidth = 0.8, linetype = "solid"),
+    axis.ticks.x = element_line(colour = "grey",
+                                linewidth = 0.8, linetype = "solid"),
+    axis.line.x = element_line(colour = "grey",
+                               linewidth = 0.8, linetype = "solid"),
+    axis.text.x = element_text(size = 13,  color = "#284b80" ),
+    axis.text.y = element_text(size = 15,  color = "grey" ),
+    axis.title.y = element_text(size = 14,  color = "#284b80" ),
+    axis.title.x = element_text(size = 14,  color = "#284b80" ),
+    legend.position="none"
+    )
+
+response_bat
+ggsave("pacs/reponse_bat.png", width = 10, height = 5, dpi = 300)
+  
+response_dist_inv = response_curves_data %>%
+  filter(expl.name == "dist_inv") %>% 
+  ggplot( aes(x = expl.val/1000, y = pred.val, 
+              color = pred.name)) +
+  geom_line(size = 1) +
+  scale_color_manual(values = palette) +
+  scale_y_continuous(position="left", n.breaks = 10, expand = c(0, 0), limits = c(0,1)) +
+  scale_x_continuous(position="bottom", n.breaks = 20, expand = c(0, 0)) +
+  
+  labs(y = "Prediction", x = "Distance (Km)") +
+  theme(
+    panel.background = element_blank(),
+    axis.ticks.y = element_line(colour = "grey",
+                                linewidth = 0.8, linetype = "solid"),
+    axis.line.y = element_line(colour = "grey",
+                               linewidth = 0.8, linetype = "solid"),
+    axis.ticks.x = element_line(colour = "grey",
+                                linewidth = 0.8, linetype = "solid"),
+    axis.line.x = element_line(colour = "grey",
+                               linewidth = 0.8, linetype = "solid"),
+    axis.text.x = element_text(size = 13,  color = "#284b80" ),
+    axis.text.y = element_text(size = 15,  color = "grey" ),
+    axis.title.y = element_text(size = 14,  color = "#284b80" ),
+    axis.title.x = element_text(size = 14,  color = "#284b80" ),
+    legend.position="none"
+  )  
+  
+response_dist_inv
+ggsave("pacs/response_dist_inv.png", width = 10, height = 5, dpi = 300)
 
 
-bm_PlotResponseCurves(bm.out = myBiomodModelOut19,
-                      models.chosen = get_built_models(myBiomodModelOut19,algo = "RF"),
-                      fixed.var = 'median',
-                      do.bivariate = TRUE)
+
+response_dist_inv = response_curves_data %>%
+  
+  ggplot( aes(x = expl.val/1000, y = pred.val, 
+              fill = pred.name)) +
+
+ggplot(data, aes(X, Y, fill= Z)) + 
+  geom_tile()
+
+
+
+
+
+#response_curves_data %>%
+ #filter(expl.name == "dist_inv") %>% 
+ #filter(pred.val > 0.7) %>% 
+ #mutate(med_dist = mean(expl.val),
+  #      dp_dist = sd(expl.val),
+  #      med_dist = median(expl.val))
+
+
+
+
+
+##########
+
+scale_x_discrete(labels = c('Matacões e Paredões','Tocas e Fendas','Grutas', "Lages", "Rochas P e M")) +
+  geom_boxplot(lwd = 0.2) +
+  scale_y_continuous(position="left", n.breaks = 10, expand = c(0, 0.05)) +
+  ggtitle("Índice de Abragência Relativa das Geomorfologias (IAR GEO)") +
+  xlab("") +
+  labs(y = "IAR GEO") +
+  #geom_jitter(color="black", size=0.2, alpha=0.5) +
+  theme(
+    panel.background = element_blank(),
+    axis.ticks.y = element_line(colour = "grey",
+                                linewidth = 0.8, linetype = "solid"),
+    axis.line.y = element_line(colour = "grey",
+                               linewidth = 0.8, linetype = "solid"),
+    axis.text.x = element_text(size = 13,  color = "#284b80" ),
+    axis.text.y = element_text(size = 15,  color = "grey" ),
+    axis.title.y = element_text(size = 14,  color = "#284b80" ),
+    legend.position="none",
+    axis.ticks.x = element_blank(), 
+    plot.title = element_text(hjust = 0.5, size = 18, color ="#284b80" )
+  )
+
+#########
+
+
 
 
 # Projection # no need ensemble because is just one model. The projection make 
@@ -1195,6 +1316,12 @@ myBiomodProj <- BIOMOD_Projection(bm.mod = myBiomodModelOut5,
                                   metric.filter = 'TSS',
                                   build.clamping.mask = TRUE)
 
+str(myBiomodProj)
+teste <- raster("./Tubastraea.coccinea/proj_Current/proj_Current_Tubastraea.coccinea_TSSfilt.tif")
+plot(teste)
+
+teste2 <- raster("./Tubastraea.coccinea/proj_Current/proj_Current_Tubastraea.coccinea_TSSbin.tif")
+plot(teste2)
 
 list.files("Tubastraea.coccinea./proj_current/")
 
