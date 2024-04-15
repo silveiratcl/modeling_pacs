@@ -1191,6 +1191,7 @@ response_curves<- bm_PlotResponseCurves(bm.out = myBiomodModelOut5,
 response_curves_data <- response_curves$plot$data
 
 library("viridis")
+library("foreach")
 palette <- viridis_pal(option = "viridis")(20)
 
 # plot
@@ -1255,54 +1256,33 @@ ggsave("pacs/response_dist_inv.png", width = 10, height = 5, dpi = 300)
 
 
 
-response_dist_inv = response_curves_data %>%
+response_curves_bivariate<- bm_PlotResponseCurves(bm.out = myBiomodModelOut5,
+                                        models.chosen = get_built_models(myBiomodModelOut5)[c(1,3,5,7,9,11,13,15,17,19,21,23,25,27,29,31,33,35,37,39)],
+                                        fixed.var = 'median',
+                                        do.bivariate = TRUE)
+
+response_curves_bivariate_data = response_curves_bivariate$tab
+
+
+
+bat = response_curves_bivariate_data %>% 
+  filter(expl.name == "bat", comb == "bat+dist_inv") %>%  
+  select(expl.val)
   
-  ggplot( aes(x = expl.val/1000, y = pred.val, 
-              fill = pred.name)) +
+dist = response_curves_bivariate_data %>% 
+  filter(expl.name == "dist_inv", comb == "bat+dist_inv") %>% 
+  select(expl.val)
 
-ggplot(data, aes(X, Y, fill= Z)) + 
+pred = response_curves_bivariate_data %>% 
+  filter(expl.name == "dist_inv", comb == "bat+dist_inv") %>% 
+  select(pred.val)
+
+
+data_biv = cbind(bat, dist, pred)
+names(data_biv) = c("bat", "dist", "pred")
+
+ggplot(data_biv, aes(x = bat, y = dist, fill=pred )) + 
   geom_tile()
-
-
-
-
-
-#response_curves_data %>%
- #filter(expl.name == "dist_inv") %>% 
- #filter(pred.val > 0.7) %>% 
- #mutate(med_dist = mean(expl.val),
-  #      dp_dist = sd(expl.val),
-  #      med_dist = median(expl.val))
-
-
-
-
-
-##########
-
-scale_x_discrete(labels = c('Matacões e Paredões','Tocas e Fendas','Grutas', "Lages", "Rochas P e M")) +
-  geom_boxplot(lwd = 0.2) +
-  scale_y_continuous(position="left", n.breaks = 10, expand = c(0, 0.05)) +
-  ggtitle("Índice de Abragência Relativa das Geomorfologias (IAR GEO)") +
-  xlab("") +
-  labs(y = "IAR GEO") +
-  #geom_jitter(color="black", size=0.2, alpha=0.5) +
-  theme(
-    panel.background = element_blank(),
-    axis.ticks.y = element_line(colour = "grey",
-                                linewidth = 0.8, linetype = "solid"),
-    axis.line.y = element_line(colour = "grey",
-                               linewidth = 0.8, linetype = "solid"),
-    axis.text.x = element_text(size = 13,  color = "#284b80" ),
-    axis.text.y = element_text(size = 15,  color = "grey" ),
-    axis.title.y = element_text(size = 14,  color = "#284b80" ),
-    legend.position="none",
-    axis.ticks.x = element_blank(), 
-    plot.title = element_text(hjust = 0.5, size = 18, color ="#284b80" )
-  )
-
-#########
-
 
 
 
