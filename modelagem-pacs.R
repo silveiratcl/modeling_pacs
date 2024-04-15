@@ -33,7 +33,7 @@ install.packages("ggtext")
 install.packages("data.table")
 install.packages("gridExtra")
 install.packages("tidyverse")  
-
+install.packages('ggplot2') 
 
 ## Carregamento dos pacotes
 library(raster)
@@ -55,7 +55,7 @@ library(ggtext)
 library(data.table)
 library(gridExtra)
 library(tidyverse)
-
+library(ggplot2) 
 
 ## Carregando os dados de ocorrência e ausência
 dfocc <- read.table("./occ_abs_cs/occ_abs_model_edited_occ.csv", header = T, sep = ",", dec = ".")
@@ -488,7 +488,7 @@ myBiomodOption
 
 ## Computando os modelos
 myBiomodModelOut1 <- BIOMOD_Modeling(myBiomodData1,
-                                     models = c('RF','GLM'), 
+                                     models = c('RF'), 
                                      bm.options = myBiomodOption,
                                      CV.strategy = 'random',
                                      CV.nb.rep = 20,
@@ -502,7 +502,7 @@ myBiomodModelOut1 <- BIOMOD_Modeling(myBiomodData1,
 myBiomodModelOut1
 
 myBiomodModelOut2 <- BIOMOD_Modeling(myBiomodData2,
-                                     models = c('RF', 'GLM'),  
+                                     models = c('RF'),  
                                      bm.options = myBiomodOption,
                                      CV.strategy = 'random',
                                      CV.nb.rep = 20,
@@ -515,7 +515,7 @@ myBiomodModelOut2 <- BIOMOD_Modeling(myBiomodData2,
 myBiomodModelOut2
 
 myBiomodModelOut3 <- BIOMOD_Modeling(myBiomodData3,
-                                     models = c('RF', 'GLM'),  
+                                     models = c('RF'),  
                                      bm.options = myBiomodOption,
                                      CV.strategy = 'random',
                                      CV.nb.rep = 20,
@@ -528,7 +528,7 @@ myBiomodModelOut3 <- BIOMOD_Modeling(myBiomodData3,
 myBiomodModelOut3
 
 myBiomodModelOut4 <- BIOMOD_Modeling(myBiomodData4,
-                                     models = c('RF','GLM'), 
+                                     models = c('RF'), 
                                      bm.options = myBiomodOption,
                                      CV.strategy = 'random',
                                      CV.nb.rep = 20,
@@ -541,7 +541,7 @@ myBiomodModelOut4 <- BIOMOD_Modeling(myBiomodData4,
 myBiomodModelOut4
 
 myBiomodModelOut5 <- BIOMOD_Modeling(myBiomodData5,
-                                     models = c('RF','GLM'), 
+                                     models = c('RF'), 
                                      bm.options = myBiomodOption,
                                      CV.strategy = 'random',
                                      CV.nb.rep = 20,
@@ -554,7 +554,7 @@ myBiomodModelOut5 <- BIOMOD_Modeling(myBiomodData5,
 myBiomodModelOut5
 
 myBiomodModelOut6 <- BIOMOD_Modeling(myBiomodData6,
-                                     models = c('RF','GLM'), 
+                                     models = c('RF'), 
                                      bm.options = myBiomodOption,
                                      CV.strategy = 'random',
                                      CV.nb.rep = 20,
@@ -567,7 +567,7 @@ myBiomodModelOut6 <- BIOMOD_Modeling(myBiomodData6,
 myBiomodModelOut6
 
 myBiomodModelOut7 <- BIOMOD_Modeling(myBiomodData7,
-                                     models = c('RF','GLM'), 
+                                     models = c('RF'), 
                                      bm.options = myBiomodOption,
                                      CV.strategy = 'random',
                                      CV.nb.rep = 20,
@@ -580,7 +580,7 @@ myBiomodModelOut7 <- BIOMOD_Modeling(myBiomodData7,
 myBiomodModelOut7
 
 myBiomodModelOut8 <- BIOMOD_Modeling(myBiomodData8,
-                                     models = c('RF','GLM'), 
+                                     models = c('RF'), 
                                      bm.options = myBiomodOption,
                                      CV.strategy = 'random',
                                      CV.nb.rep = 20,
@@ -593,7 +593,7 @@ myBiomodModelOut8 <- BIOMOD_Modeling(myBiomodData8,
 myBiomodModelOut8
 
 myBiomodModelOut9 <- BIOMOD_Modeling(myBiomodData9,
-                                     models = c('RF','GLM'), 
+                                     models = c('RF'), 
                                      bm.options = myBiomodOption,
                                      CV.strategy = 'random',
                                      CV.nb.rep = 20,
@@ -606,7 +606,7 @@ myBiomodModelOut9 <- BIOMOD_Modeling(myBiomodData9,
 myBiomodModelOut9
 
 myBiomodModelOut10 <- BIOMOD_Modeling(myBiomodData10,
-                                     models = c('RF','GLM'), 
+                                     models = c('RF'), 
                                      bm.options = myBiomodOption,
                                      CV.strategy = 'random',
                                      CV.nb.rep = 20,
@@ -619,7 +619,7 @@ myBiomodModelOut10 <- BIOMOD_Modeling(myBiomodData10,
 myBiomodModelOut10
 
 myBiomodModelOut11 <- BIOMOD_Modeling(myBiomodData11,
-                                     models = c('RF','GLM'), 
+                                     models = c('RF'), 
                                      bm.options = myBiomodOption,
                                      CV.strategy = 'random',
                                      CV.nb.rep = 20,
@@ -632,7 +632,7 @@ myBiomodModelOut11 <- BIOMOD_Modeling(myBiomodData11,
 myBiomodModelOut11
 
 myBiomodModelOut12 <- BIOMOD_Modeling(myBiomodData12,
-                                     models = c('RF','GLM'), 
+                                     models = c('RF'), 
                                      bm.options = myBiomodOption,
                                      CV.strategy = 'random',
                                      CV.nb.rep = 20,
@@ -645,7 +645,7 @@ myBiomodModelOut12 <- BIOMOD_Modeling(myBiomodData12,
 myBiomodModelOut12
 
 myBiomodModelOut13 <- BIOMOD_Modeling(myBiomodData13,
-                                     models = c('RF','GLM'), 
+                                     models = c('RF'), 
                                      bm.options = myBiomodOption,
                                      CV.strategy = 'random',
                                      CV.nb.rep = 20,
@@ -658,7 +658,7 @@ myBiomodModelOut13 <- BIOMOD_Modeling(myBiomodData13,
 myBiomodModelOut13
 
 myBiomodModelOut14 <- BIOMOD_Modeling(myBiomodData14,
-                                     models = c('RF','GLM'), 
+                                     models = c('RF'), 
                                      bm.options = myBiomodOption,
                                      CV.strategy = 'random',
                                      CV.nb.rep = 20,
@@ -671,7 +671,7 @@ myBiomodModelOut14 <- BIOMOD_Modeling(myBiomodData14,
 myBiomodModelOut14
 
 myBiomodModelOut15 <- BIOMOD_Modeling(myBiomodData15,
-                                     models = c('RF','GLM'), 
+                                     models = c('RF'), 
                                      bm.options = myBiomodOption,
                                      CV.strategy = 'random',
                                      CV.nb.rep = 20,
@@ -684,7 +684,7 @@ myBiomodModelOut15 <- BIOMOD_Modeling(myBiomodData15,
 myBiomodModelOut15
 
 myBiomodModelOut16 <- BIOMOD_Modeling(myBiomodData16,
-                                     models = c('RF','GLM'), 
+                                     models = c('RF'), 
                                      bm.options = myBiomodOption,
                                      CV.strategy = 'random',
                                      CV.nb.rep = 20,
@@ -697,7 +697,7 @@ myBiomodModelOut16 <- BIOMOD_Modeling(myBiomodData16,
 myBiomodModelOut16
 
 myBiomodModelOut17 <- BIOMOD_Modeling(myBiomodData17,
-                                     models = c('RF','GLM'), 
+                                     models = c('RF'), 
                                      bm.options = myBiomodOption,
                                      CV.strategy = 'random',
                                      CV.nb.rep = 20,
@@ -710,7 +710,7 @@ myBiomodModelOut17 <- BIOMOD_Modeling(myBiomodData17,
 myBiomodModelOut17
 
 myBiomodModelOut18 <- BIOMOD_Modeling(myBiomodData18,
-                                     models = c('RF','GLM'), 
+                                     models = c('RF'), 
                                      bm.options = myBiomodOption,
                                      CV.strategy = 'random',
                                      CV.nb.rep = 20,
@@ -723,7 +723,7 @@ myBiomodModelOut18 <- BIOMOD_Modeling(myBiomodData18,
 myBiomodModelOut18
 
 myBiomodModelOut19 <- BIOMOD_Modeling(myBiomodData19,
-                                     models = c('RF','GLM'), 
+                                     models = c('RF'), 
                                      bm.options = myBiomodOption,
                                      CV.strategy = 'random',
                                      CV.nb.rep = 20,
@@ -736,7 +736,7 @@ myBiomodModelOut19 <- BIOMOD_Modeling(myBiomodData19,
 myBiomodModelOut19
 
 myBiomodModelOut20 <- BIOMOD_Modeling(myBiomodData20,
-                                     models = c('RF','GLM'), 
+                                     models = c('RF'), 
                                      bm.options = myBiomodOption,
                                      CV.strategy = 'random',
                                      CV.nb.rep = 20,
@@ -749,7 +749,7 @@ myBiomodModelOut20 <- BIOMOD_Modeling(myBiomodData20,
 myBiomodModelOut20
 
 myBiomodModelOut21 <- BIOMOD_Modeling(myBiomodData21,
-                                     models = c('RF','GLM'), 
+                                     models = c('RF'), 
                                      bm.options = myBiomodOption,
                                      CV.strategy = 'random',
                                      CV.nb.rep = 20,
@@ -762,7 +762,7 @@ myBiomodModelOut21 <- BIOMOD_Modeling(myBiomodData21,
 myBiomodModelOut21
 
 myBiomodModelOut22 <- BIOMOD_Modeling(myBiomodData22,
-                                     models = c('RF','GLM'), 
+                                     models = c('RF'), 
                                      bm.options = myBiomodOption,
                                      CV.strategy = 'random',
                                      CV.nb.rep = 20,
@@ -775,7 +775,7 @@ myBiomodModelOut22 <- BIOMOD_Modeling(myBiomodData22,
 myBiomodModelOut22
 
 myBiomodModelOut23 <- BIOMOD_Modeling(myBiomodData23,
-                                     models = c('RF','GLM'), 
+                                     models = c('RF'), 
                                      bm.options = myBiomodOption,
                                      CV.strategy = 'random',
                                      CV.nb.rep = 20,
@@ -788,7 +788,7 @@ myBiomodModelOut23 <- BIOMOD_Modeling(myBiomodData23,
 myBiomodModelOut23
 
 myBiomodModelOut24 <- BIOMOD_Modeling(myBiomodData24,
-                                     models = c('RF','GLM'), 
+                                     models = c('RF'), 
                                      bm.options = myBiomodOption,
                                      CV.strategy = 'random',
                                      CV.nb.rep = 20,
@@ -801,7 +801,7 @@ myBiomodModelOut24 <- BIOMOD_Modeling(myBiomodData24,
 myBiomodModelOut24
 
 myBiomodModelOut25 <- BIOMOD_Modeling(myBiomodData25,
-                                     models = c('RF','GLM'), 
+                                     models = c('RF'), 
                                      bm.options = myBiomodOption,
                                      CV.strategy = 'random',
                                      CV.nb.rep = 20,
@@ -814,7 +814,7 @@ myBiomodModelOut25 <- BIOMOD_Modeling(myBiomodData25,
 myBiomodModelOut25
 
 myBiomodModelOut26 <- BIOMOD_Modeling(myBiomodData26,
-                                     models = c('RF','GLM'), 
+                                     models = c('RF'), 
                                      bm.options = myBiomodOption,
                                      CV.strategy = 'random',
                                      CV.nb.rep = 20,
@@ -828,7 +828,7 @@ myBiomodModelOut26
 
 
 myBiomodModelOut27 <- BIOMOD_Modeling(myBiomodData27,
-                                     models = c('RF','GLM'), 
+                                     models = c('RF'), 
                                      bm.options = myBiomodOption,
                                      CV.strategy = 'random',
                                      CV.nb.rep = 20,
@@ -841,7 +841,7 @@ myBiomodModelOut27 <- BIOMOD_Modeling(myBiomodData27,
 myBiomodModelOut27
 
 myBiomodModelOut28 <- BIOMOD_Modeling(myBiomodData28,
-                                     models = c('RF','GLM'), 
+                                     models = c('RF'), 
                                      bm.options = myBiomodOption,
                                      CV.strategy = 'random',
                                      CV.nb.rep = 20,
@@ -854,7 +854,7 @@ myBiomodModelOut28 <- BIOMOD_Modeling(myBiomodData28,
 myBiomodModelOut28
 
 myBiomodModelOut29 <- BIOMOD_Modeling(myBiomodData29,
-                                     models = c('RF','GLM'), 
+                                     models = c('RF'), 
                                      bm.options = myBiomodOption,
                                      CV.strategy = 'random',
                                      CV.nb.rep = 20,
@@ -867,7 +867,7 @@ myBiomodModelOut29 <- BIOMOD_Modeling(myBiomodData29,
 myBiomodModelOut29
 
 myBiomodModelOut30 <- BIOMOD_Modeling(myBiomodData30,
-                                     models = c('RF','GLM'), 
+                                     models = c('RF'), 
                                      bm.options = myBiomodOption,
                                      CV.strategy = 'random',
                                      CV.nb.rep = 20,
@@ -880,7 +880,7 @@ myBiomodModelOut30 <- BIOMOD_Modeling(myBiomodData30,
 myBiomodModelOut30
 
 myBiomodModelOut31 <- BIOMOD_Modeling(myBiomodData31,
-                                     models = c('RF','GLM'), 
+                                     models = c('RF'), 
                                      bm.options = myBiomodOption,
                                      CV.strategy = 'random',
                                      CV.nb.rep = 20,
@@ -1053,6 +1053,7 @@ eval_list <-  list(eval_myBiomodModelOut1,
                   eval_myBiomodModelOut29,
                   eval_myBiomodModelOut30,
                   eval_myBiomodModelOut31)
+str(eval_myBiomodModelOut5)
 
 # Combining eval tables ordering by the higher values
 # of average ROC across the model runs 
@@ -1060,7 +1061,7 @@ eval_list_table <- eval_list %>%
   # bind tables by row
   bind_rows() %>% 
   # filtering by metric eval and algo
-  filter(metric.eval == "TSS", algo == "RF") %>% 
+  #filter(metric.eval == "TSS", algo == "RF") %>% 
   group_by(model, algo, metric.eval, preds) %>%
   summarise(avg_validation = mean(validation),
             sd_validation = round(sd(validation), digits = 3),
@@ -1071,64 +1072,72 @@ eval_list_table <- eval_list %>%
   ungroup()
   
 eval_list_table
+save(eval_list_table, myBiomodModelOut5, file = "modelling_result_data_20240410.RData")
+
+##Plotting the eval list table
 eval_models_df <- data.table(do.call(cbind, eval_list_table))
-
-
 mytheme <- ttheme_default(base_size = 10, base_colour = 'black', base_family = "TT Times New Roman",
                           parse = FALSE, padding = unit(c(3, 3), "mm",))
 grid.table(eval_models_df[1:10,],  theme = mytheme)
+save(grid.table, file = "eval_models_table_20240410.Rplot")
 
 ## Obtendo a importância das variáveis
-get_variables_importance(myBiomodModelOut19)%>%
-  filter(algo == "RF") %>%
-  group_by(full.name, run, algo, expl.var, var.imp) %>%
-  summarise(avg_var.imp = mean(var.imp)) %>%
-  arrange(-avg_var.imp) %>%
-  ungroup()
-                                             
+varimp <- get_variables_importance(myBiomodModelOut5)
+str(varimp)
+                            
 # Model that had the best performance 
 
 #Represent evaluation scores & variables importance
-bm_PlotEvalMean(bm.out = myBiomodModelOut19)
-
-# comparison between ROC and TSS
-#bm_PlotEvalBoxplot(bm.out = myBiomodModelOut5, group.by = c('algo', 'algo')) # change to dot chart y 0-1
+bm_PlotEvalMean(bm.out = myBiomodModelOut5)
 
 # TSS and ROC By run
-bm_PlotEvalBoxplot(bm.out = myBiomodModelOut19,group.by = c('algo', 'run')) # change to dot chart y 0-1
+#bm_PlotEvalBoxplot(bm.out = myBiomodModelOut5,group.by = c('algo', 'run')) # change to dot chart y 0-1
+ggplot(eval_myBiomodModelOut5, aes(x = run, y = calibration)) +
+  geom_point(color = 'dark blue', fill = 'light blue') +
+  labs(x = 'Rounds', y = 'Calibration') +
+  coord_flip() +
+  theme_light(base_size = 10)
 
 # Variable importance
-bm_PlotVarImpBoxplot(bm.out = myBiomodModelOut19,group.by = c('expl.var', 'algo', 'algo'))
+#bm_PlotVarImpBoxplot(bm.out = myBiomodModelOut5, group.by = c('expl.var', 'algo','algo'))
+ggplot(varimp, aes(x = expl.var, y = var.imp)) +
+  labs(x = 'Predictor', y = 'Importance', title = 'The importance of the predictors in the model') +
+  geom_boxplot(color = 'slategray', fill = 'lightblue1') +
+  theme_light(base_size = 10)
+
+colours()
 
 
 # just view, not for the report
-bm_PlotVarImpBoxplot(bm.out = myBiomodModelOut1, group.by = c('expl.var', 'algo', 'run'))
+bm_PlotVarImpBoxplot(bm.out = myBiomodModelOut5, group.by = c('expl.var', 'algo', 'run'))
 
 # just view
-bm_PlotVarImpBoxplot(bm.out = myBiomodModelOut1, group.by = c('algo', 'expl.var', 'run'))
+bm_PlotVarImpBoxplot(bm.out = myBiomodModelOut5, group.by = c('algo', 'expl.var', 'run'))
 
 
 # aprimorar
 bm_PlotResponseCurves(bm.out = myBiomodModelOut5,
-                      models.chosen = get_built_models(myBiomodModelOut5)[c(1,3,5,7,9,11,13,15,17,19,21,23,25,27,29,31,33,35,37,39)],
+                      models.chosen = get_built_models(myBiomodModelOut5),
                       fixed.var = 'median')
 
+
 bm_PlotResponseCurves(bm.out = myBiomodModelOut5, 
-                      models.chosen = get_built_models(myBiomodModelOut5, algo = "RF"),
+                      models.chosen = get_built_models(myBiomodModelOut5),
                       fixed.var = 'min')
 
 
-bm_PlotResponseCurves(bm.out = myBiomodModelOut19,
-                      models.chosen = get_built_models(myBiomodModelOut19,algo = "RF"),
+bm_PlotResponseCurves(bm.out = myBiomodModelOut5,
+                      models.chosen = get_built_models(myBiomodModelOut5),
                       fixed.var = 'median',
                       do.bivariate = TRUE)
+
 
 # Projection # no need ensemble because is just one model. The projection make 
 
 myBiomodProj <- BIOMOD_Projection(bm.mod = myBiomodModelOut5,
                                   proj.name = 'Current',
                                   new.env = predictors5,
-                                  models.chosen = get_built_models(myBiomodModelOut5,algo = "RF"),
+                                  models.chosen = get_built_models(myBiomodModelOut5),
                                   metric.binary = 'TSS',
                                   metric.filter = 'TSS',
                                   build.clamping.mask = TRUE)
