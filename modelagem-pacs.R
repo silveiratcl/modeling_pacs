@@ -1157,9 +1157,9 @@ bm_PlotResponseCurves(bm.out = myBiomodModelOut5,
 =======
 eval_list_table 
 
- eval_models_df <- data.table(do.call(cbind, eval_list_table))
-eval_models_df <- eval_models_df[, c(4,5,8,9)] 
-names(eval_models_df) <- c("Modelo", "Média Validação", "D.P. Validação", "TSS Médio")
+eval_models_df <- data.table(do.call(cbind, eval_list_table))
+eval_models_df <- eval_models_df[, c(4,5,9)] 
+names(eval_models_df) <- c("Modelo", "Validação", "TSS Médio")
 
 mytheme <- ttheme_default(base_size = 10, 
                           base_colour = '#043480', 
@@ -1168,7 +1168,6 @@ mytheme <- ttheme_default(base_size = 10,
                           padding = unit(c(3, 3), "mm",))
 
 grid.table(eval_models_df[1:10, ],  theme = mytheme)
-
 
 ### Figures
 
@@ -1252,7 +1251,7 @@ response_bat = response_curves_data %>%
     )
 
 response_bat
-ggsave("pacs/reponse_bat.png", width = 10, height = 5, dpi = 300)
+ggsave("pacs_figs/reponse_bat.png", width = 10, height = 5, dpi = 300)
   
 response_dist_inv = response_curves_data %>%
   filter(expl.name == "dist_inv") %>% 
@@ -1282,7 +1281,7 @@ response_dist_inv = response_curves_data %>%
   )  
   
 response_dist_inv
-ggsave("pacs/response_dist_inv.png", width = 10, height = 5, dpi = 300)
+ggsave("pacs_figs/response_dist_inv.png", width = 10, height = 5, dpi = 300)
 
 
 # Response bivariate all models
@@ -1307,10 +1306,12 @@ pred = response_curves_bivariate_data %>%
 data_biv = cbind(bat, dist, pred)
 names(data_biv) = c("bat", "dist", "pred")
 
-ggplot(data_biv, aes(x = dist/1000, y = bat, fill=pred )) + 
+response_dist_inv_bivariate = ggplot(data_biv, aes(x = dist/1000, y = bat, fill=pred )) + 
   geom_tile() +
   xlab("Distância da Invasão (Km)") +
   ylab("Batimetria (m)") +
+  labs(fill = "Predição") +
+  scale_fill_continuous(n.breaks = 3, limits = c(0,1)) +
   scale_y_continuous(position="left", n.breaks = 10, expand = c(0, 0)) +
   scale_x_continuous(n.breaks = 10, expand = c(0, 0)) +
   theme(
@@ -1321,19 +1322,23 @@ ggplot(data_biv, aes(x = dist/1000, y = bat, fill=pred )) +
                                linewidth = 0.8, linetype = "solid"),
     axis.line.x = element_line(colour = "grey",
                                linewidth = 0.8, linetype = "solid"),
-    axis.text.x = element_text(size = 13,  color = "#284b80" ),
-    axis.text.y = element_text(size = 15,  color = "#284b80" ),
-    axis.title.x = element_text(size = 14,  color = "#284b80" ),
-    axis.title.y = element_text(size = 14,  color = "#284b80" ),
+    axis.text.x = element_text(size = 14,  color = "#284b80" ),
+    axis.text.y = element_text(size = 14,  color = "#284b80" ),
+    axis.title.x = element_text(size = 16,  color = "#284b80" ),
+    axis.title.y = element_text(size = 16,  color = "#284b80" ),
     axis.ticks.x = element_blank(), 
-    plot.title = element_text(hjust = 0.5, size = 18, color ="#284b80")
+    plot.title = element_text(hjust = 0.5, size = 18, color ="#284b80"),
+    legend.title = element_text(face = "bold", color = "#284b80"),
+    legend.text = element_text(color = "#284b80", size = 10),
   )
 
+response_dist_inv_bivariate
+ggsave("pacs/response_dist_inv_bivariate.png", width = 10, height = 8, dpi = 300)
 
 
 ################################################################################
 
-####
+#### Cola formato
 scale_x_discrete(labels = c('Matacões e Paredões','Tocas e Fendas','Grutas', "Lages", "Rochas P e M")) +
   geom_boxplot(lwd = 0.2) +
   scale_y_continuous(position="left", n.breaks = 10, expand = c(0, 0.05)) +
@@ -1378,12 +1383,11 @@ myBiomodProj <- BIOMOD_Projection(bm.mod = myBiomodModelOut5,
 
 str(myBiomodProj)
 teste <- raster("./Tubastraea.coccinea/proj_Current/proj_Current_Tubastraea.coccinea_TSSfilt.tif")
-plot(teste)
+plot(teste/1000)
+plot(land, add = TRUE, col = "grey")
 
-teste2 <- raster("./Tubastraea.coccinea/proj_Current/proj_Current_Tubastraea.coccinea_TSSbin.tif")
-plot(teste2)
 
-list.files("Tubastraea.coccinea./proj_current/")
+Zlist.files("Tubastraea.coccinea./proj_current/")
 
 
 plot(myBiomodProj)
