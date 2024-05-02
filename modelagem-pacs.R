@@ -926,7 +926,7 @@ eval_myBiomodModelOut1<-as_tibble(get_evaluations(myBiomodModelOut1)) %>%
 
 eval_myBiomodModelOut2<-as_tibble(get_evaluations(myBiomodModelOut2)) %>% 
   mutate(model = paste("model_2"),
-         preds = paste('bat + sst'))
+         preds = paste('batimetria + sst'))
 
 eval_myBiomodModelOut3<-as_tibble(get_evaluations(myBiomodModelOut3)) %>% 
   mutate(model = paste("model_3"),
@@ -938,7 +938,7 @@ eval_myBiomodModelOut4<-as_tibble(get_evaluations(myBiomodModelOut4)) %>%
 
 eval_myBiomodModelOut5<-as_tibble(get_evaluations(myBiomodModelOut5)) %>% 
   mutate(model = paste("model_5"),
-         preds = paste('bat + dist_inv'))
+         preds = paste('batimetria + distância primeiros focos'))
 
 eval_myBiomodModelOut6<-as_tibble(get_evaluations(myBiomodModelOut6)) %>% 
   mutate(model = paste("model_6"),
@@ -954,7 +954,7 @@ eval_myBiomodModelOut8<-as_tibble(get_evaluations(myBiomodModelOut8)) %>%
 
 eval_myBiomodModelOut9<-as_tibble(get_evaluations(myBiomodModelOut9)) %>% 
   mutate(model = paste("model_9"),
-         preds = paste('velc + sst'))
+         preds = paste('velocidade corrente + sst'))
 
 eval_myBiomodModelOut10<-as_tibble(get_evaluations(myBiomodModelOut10)) %>% 
   mutate(model = paste("model_10"),
@@ -966,7 +966,7 @@ eval_myBiomodModelOut11<-as_tibble(get_evaluations(myBiomodModelOut11)) %>%
 
 eval_myBiomodModelOut12<-as_tibble(get_evaluations(myBiomodModelOut12)) %>% 
   mutate(model = paste("model_12"),
-         preds = paste('velc + dist_inv'))
+         preds = paste('velocidade corrente + distância primeiros focos'))
 
 eval_myBiomodModelOut13<-as_tibble(get_evaluations(myBiomodModelOut13)) %>% 
   mutate(model = paste("model_13"),
@@ -974,15 +974,15 @@ eval_myBiomodModelOut13<-as_tibble(get_evaluations(myBiomodModelOut13)) %>%
 
 eval_myBiomodModelOut14<-as_tibble(get_evaluations(myBiomodModelOut14)) %>% 
   mutate(model = paste("model_14"),
-         preds = paste('velc + d_mar'))
+         preds = paste('velocidade corrente + distância portos e marinas'))
 
 eval_myBiomodModelOut15<-as_tibble(get_evaluations(myBiomodModelOut15)) %>% 
   mutate(model = paste("model_15"),
-         preds = paste('sst + d_mar'))
+         preds = paste('sst + distância portos e marinas'))
 
 eval_myBiomodModelOut16<-as_tibble(get_evaluations(myBiomodModelOut16)) %>% 
   mutate(model = paste("model_16"),
-         preds = paste('mhw + d_mar'))
+         preds = paste('mhw + distância portos e marinas'))
 
 eval_myBiomodModelOut17<-as_tibble(get_evaluations(myBiomodModelOut17)) %>% 
   mutate(model = paste("model_17"),
@@ -990,11 +990,11 @@ eval_myBiomodModelOut17<-as_tibble(get_evaluations(myBiomodModelOut17)) %>%
 
 eval_myBiomodModelOut18<-as_tibble(get_evaluations(myBiomodModelOut18)) %>% 
   mutate(model = paste("model_18"),
-         preds = paste('mcs + d_mar'))
+         preds = paste('mcs + distância portos e marinas'))
 
 eval_myBiomodModelOut19<-as_tibble(get_evaluations(myBiomodModelOut19)) %>% 
   mutate(model = paste("model_19"),
-         preds = paste('dist_inv + d_mar'))
+         preds = paste('distância primeiros focos + distância portos e marinas'))
 
 eval_myBiomodModelOut20<-as_tibble(get_evaluations(myBiomodModelOut20)) %>% 
   mutate(model = paste("model_20"),
@@ -1094,7 +1094,6 @@ eval_list_table <- eval_list %>%
   arrange(-avg_validation) %>% 
   ungroup()
   
-<<<<<<< HEAD
 eval_list_table
 save(eval_list_table, myBiomodModelOut5, file = "modelling_result_data_20240410.RData")
 
