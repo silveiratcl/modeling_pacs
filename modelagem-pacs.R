@@ -1234,7 +1234,6 @@ response_dist_inv
 ggsave("pacs_figs/response_dist_inv.png", width = 10, height = 5, dpi = 300)
 
 
-
 # Response bivariate all models
 response_curves_bivariate<- bm_PlotResponseCurves(bm.out = myBiomodModelOut5,
                                                   models.chosen = get_built_models(myBiomodModelOut5)[c(1,3,5,7,9,11,13,15,17,19,21,23,25,27,29,31,33,35,37,39)],
