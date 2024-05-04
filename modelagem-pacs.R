@@ -17,7 +17,7 @@ setwd("C:/Users/silve/OneDrive/Área de Trabalho/modeling_pacs_2024/modeling_pac
 #setwd("C:/Users/silve/OneDrive/Documentos/Academico/POS-DOC_UFSC/@Karon Coral Sol/modelling/modeling_pacs_2024/modeling_pacs")
 
 
-## Instalando os pacotes
+## Install packages
 install.packages("raster")
 install.packages("sf")
 install.packages("terra")
@@ -35,7 +35,7 @@ install.packages("gridExtra")
 install.packages("tidyverse")  
 install.packages('ggplot2') 
 
-## Carregamento dos pacotes
+## Loading packages
 library(raster)
 library(sf)
 library(terra)
@@ -57,7 +57,8 @@ library(gridExtra)
 library(tidyverse)
 library(ggplot2) 
 
-## Carregando os dados de ocorrência e ausência
+
+## Loading occurence and absence data
 dfocc <- read.table("./occ_abs_cs/occ_abs_model_edited_occ.csv", header = T, sep = ",", dec = ".")
 head(dfocc)
 dfocc <- dfocc[, c(1,2)] 
@@ -68,12 +69,14 @@ head(dfabs)
 dfabs <- dfabs[, c(1,2)] 
 head(dfabs)
 
-## Carregando as camadas máscaras #uso da funcao vect pq readogr esta ligada ao pct rgdal
+
+## Loading layer masks #uso da funcao vect pq readogr esta ligada ao pct rgdal
 study_area = vect("./study_area", "study_area")
 ocean = vect("./study_area/ocean_study_area.shp")
 land = vect("./study_area", "land_study_area")
 
-## Carregando as variáveis
+
+## Loading predictors
 bat <- raster("./layers/bat_resampled.tif")
 velc <- raster("./layers/velc_resampled.tif")
 sst <- raster("./layers/sst_resampled.tif")
@@ -83,7 +86,6 @@ dist_inv <- raster("./layers/dist_inv.tiff")
 d_cost <- raster("./layers/d_cost_resampled.tif")
 d_mar <- raster("./layers/d_mar_resampled.tif")
 d_traf <- raster("./layers/d_traf_resampled.tif")
-
 
 
 plot(bat) 
@@ -97,11 +99,7 @@ plot(mcs)
 plot(dist_inv) 
 
 
-
-
-
-
-## Filtro de proximidade
+## Filtering by proximity 
 filterByProximity <- function(xy, dist, mapUnits = F) {
   if (!mapUnits) {
     d <- spDists(xy,longlat=T)
@@ -129,7 +127,8 @@ filterByProximity <- function(xy, dist, mapUnits = F) {
   }
 }
 
-#Data frame de ocorrência (1)
+
+#Data frame - ocurrence (1)
 newdata_occ <- filterByProximity(as.matrix(dfocc), dist = 0.5, mapUnits = F)
 str(newdata_occ)
 as.data.frame(newdata_occ)
@@ -140,7 +139,8 @@ dfocc$X <- NULL
 names(dfocc) <- c ('lon_dd', 'lat_dd')
 head(dfocc)
 
-#Data frame de ausência (0)
+
+#Data frame - absence (0)
 newdata_abs <- filterByProximity(as.matrix(dfabs), dist = 0.5, mapUnits = F)
 str(newdata_abs)
 as.data.frame(newdata_abs)
@@ -151,7 +151,8 @@ dfabs$X <- NULL
 names(dfabs) <- c ('lon_dd', 'lat_dd')
 head(dfabs)
 
-#União dos dois data frames
+
+#Union of both data frame
 occ_abs <- c(rep(1, nrow(dfocc)), rep(0, nrow(dfabs)))
 df <- data.frame(cbind(occ_abs, rbind(dfocc, dfabs)))
 write.csv(df, "./occ_abs_cs/occ_abs_filtered.csv")
@@ -162,7 +163,9 @@ head(df)
 
 df
 
-## Criando um stack, ou seja, uma coleção de camadas raster, para as variáveis
+
+## Creating a stack for the predictors
+# Criando um stack, ou seja, uma coleção de camadas raster, para as variáveis
 # Stack - empilhamento
 variables <- c(bat, velc, sst, mhw, mcs, dist_inv, d_cost, d_mar, d_traf)
 variables <- stack(variables)
@@ -179,7 +182,7 @@ points(df[9:25,2:3], col = "blue")
 #points(df[9:25,2:3], col = "blue")
 
 
-## Extraindo os valores das camadas
+## Extracting values from layers
 # valor de cada variavel pra cada coordenada
 .rs.unloadPackage("tidyr") #converge com a função extract ---- não funcionou??
 occvals <- extract(variables, dfocc)
@@ -197,7 +200,7 @@ saveRDS(occvals, "./occ_abs_cs/occvals.Rds")
 saveRDS(absvals, "./occ_abs_cs/absvals.Rds")
 
 
-## Examinando as correlações entre as variáveis
+## Examining correlations between variables
 myData <- sdmdata
 describe(myData[,c(2:10)])
 
@@ -206,7 +209,7 @@ lowerCor(myData[,c(2:10)])
 dev.off()
 
 
-## Configurando os dados para o formato biomod2
+## Setting the data to biomod2 format
 myRespName <- 'Tubastraea coccinea'
 DataSpecies <- as.numeric(df$occ_abs)
 myRespXY <- df[,c("lon_dd", "lat_dd")]
@@ -339,14 +342,7 @@ names(predictors31) <- c('d_traf')
 predictors31
 
 
-## Formatando os dados
-
-#myBiomodData0 <- BIOMOD_FormatingData(resp.var = DataSpecies,
-                                      #expl.var = predictors0,
-                                      #resp.xy = myRespXY,
-                                      #resp.name = myRespName)
-
-
+## Formatting the data
 myBiomodData1 <- BIOMOD_FormatingData(resp.var = DataSpecies,
                                       expl.var = predictors1,
                                       resp.xy = myRespXY,
@@ -393,122 +389,122 @@ myBiomodData9 <- BIOMOD_FormatingData(resp.var = DataSpecies,
                                       resp.name = myRespName)
 
 myBiomodData10 <- BIOMOD_FormatingData(resp.var = DataSpecies,
-                                      expl.var = predictors10,
-                                      resp.xy = myRespXY,
-                                      resp.name = myRespName)
+                                       expl.var = predictors10,
+                                       resp.xy = myRespXY,
+                                       resp.name = myRespName)
 
 myBiomodData11 <- BIOMOD_FormatingData(resp.var = DataSpecies,
-                                      expl.var = predictors11,
-                                      resp.xy = myRespXY,
-                                      resp.name = myRespName)
+                                       expl.var = predictors11,
+                                       resp.xy = myRespXY,
+                                       resp.name = myRespName)
 
 myBiomodData12 <- BIOMOD_FormatingData(resp.var = DataSpecies,
-                                      expl.var = predictors12,
-                                      resp.xy = myRespXY,
-                                      resp.name = myRespName)
+                                       expl.var = predictors12,
+                                       resp.xy = myRespXY,
+                                       resp.name = myRespName)
 
 myBiomodData13 <- BIOMOD_FormatingData(resp.var = DataSpecies,
-                                      expl.var = predictors13,
-                                      resp.xy = myRespXY,
-                                      resp.name = myRespName)
+                                       expl.var = predictors13,
+                                       resp.xy = myRespXY,
+                                       resp.name = myRespName)
 
 myBiomodData14 <- BIOMOD_FormatingData(resp.var = DataSpecies,
-                                      expl.var = predictors14,
-                                      resp.xy = myRespXY,
-                                      resp.name = myRespName)
+                                       expl.var = predictors14,
+                                       resp.xy = myRespXY,
+                                       resp.name = myRespName)
 
 myBiomodData15 <- BIOMOD_FormatingData(resp.var = DataSpecies,
-                                      expl.var = predictors15,
-                                      resp.xy = myRespXY,
-                                      resp.name = myRespName)
+                                       expl.var = predictors15,
+                                       resp.xy = myRespXY,
+                                       resp.name = myRespName)
 
 myBiomodData16 <- BIOMOD_FormatingData(resp.var = DataSpecies,
-                                      expl.var = predictors16,
-                                      resp.xy = myRespXY,
-                                      resp.name = myRespName)
+                                       expl.var = predictors16,
+                                       resp.xy = myRespXY,
+                                       resp.name = myRespName)
 
 myBiomodData17 <- BIOMOD_FormatingData(resp.var = DataSpecies,
-                                      expl.var = predictors17,
-                                      resp.xy = myRespXY,
-                                      resp.name = myRespName)
+                                       expl.var = predictors17,
+                                       resp.xy = myRespXY,
+                                       resp.name = myRespName)
 
 myBiomodData18 <- BIOMOD_FormatingData(resp.var = DataSpecies,
-                                      expl.var = predictors18,
-                                      resp.xy = myRespXY,
-                                      resp.name = myRespName)
+                                       expl.var = predictors18,
+                                       resp.xy = myRespXY,
+                                       resp.name = myRespName)
 
 myBiomodData19 <- BIOMOD_FormatingData(resp.var = DataSpecies,
-                                      expl.var = predictors19,
-                                      resp.xy = myRespXY,
-                                      resp.name = myRespName)
+                                       expl.var = predictors19,
+                                       resp.xy = myRespXY,
+                                       resp.name = myRespName)
 
 myBiomodData20 <- BIOMOD_FormatingData(resp.var = DataSpecies,
-                                      expl.var = predictors20,
-                                      resp.xy = myRespXY,
-                                      resp.name = myRespName)
+                                       expl.var = predictors20,
+                                       resp.xy = myRespXY,
+                                       resp.name = myRespName)
 
 myBiomodData21 <- BIOMOD_FormatingData(resp.var = DataSpecies,
-                                      expl.var = predictors21,
-                                      resp.xy = myRespXY,
-                                      resp.name = myRespName)
+                                       expl.var = predictors21,
+                                       resp.xy = myRespXY,
+                                       resp.name = myRespName)
 
 myBiomodData22 <- BIOMOD_FormatingData(resp.var = DataSpecies,
-                                      expl.var = predictors22,
-                                      resp.xy = myRespXY,
-                                      resp.name = myRespName)
+                                       expl.var = predictors22,
+                                       resp.xy = myRespXY,
+                                       resp.name = myRespName)
 
 myBiomodData23 <- BIOMOD_FormatingData(resp.var = DataSpecies,
-                                      expl.var = predictors23,
-                                      resp.xy = myRespXY,
-                                      resp.name = myRespName)
+                                       expl.var = predictors23,
+                                       resp.xy = myRespXY,
+                                       resp.name = myRespName)
 
 myBiomodData24 <- BIOMOD_FormatingData(resp.var = DataSpecies,
-                                      expl.var = predictors24,
-                                      resp.xy = myRespXY,
-                                      resp.name = myRespName)
+                                       expl.var = predictors24,
+                                       resp.xy = myRespXY,
+                                       resp.name = myRespName)
 
 myBiomodData25 <- BIOMOD_FormatingData(resp.var = DataSpecies,
-                                      expl.var = predictors25,
-                                      resp.xy = myRespXY,
-                                      resp.name = myRespName)
+                                       expl.var = predictors25,
+                                       resp.xy = myRespXY,
+                                       resp.name = myRespName)
 
 myBiomodData26 <- BIOMOD_FormatingData(resp.var = DataSpecies,
-                                      expl.var = predictors26,
-                                      resp.xy = myRespXY,
-                                      resp.name = myRespName)
+                                       expl.var = predictors26,
+                                       resp.xy = myRespXY,
+                                       resp.name = myRespName)
 
 myBiomodData27 <- BIOMOD_FormatingData(resp.var = DataSpecies,
-                                      expl.var = predictors27,
-                                      resp.xy = myRespXY,
-                                      resp.name = myRespName)
+                                       expl.var = predictors27,
+                                       resp.xy = myRespXY,
+                                       resp.name = myRespName)
 
 myBiomodData28 <- BIOMOD_FormatingData(resp.var = DataSpecies,
-                                      expl.var = predictors28,
-                                      resp.xy = myRespXY,
-                                      resp.name = myRespName)
+                                       expl.var = predictors28,
+                                       resp.xy = myRespXY,
+                                       resp.name = myRespName)
 
 myBiomodData29 <- BIOMOD_FormatingData(resp.var = DataSpecies,
-                                      expl.var = predictors29,
-                                      resp.xy = myRespXY,
-                                      resp.name = myRespName)
+                                       expl.var = predictors29,
+                                       resp.xy = myRespXY,
+                                       resp.name = myRespName)
 
 myBiomodData30 <- BIOMOD_FormatingData(resp.var = DataSpecies,
-                                      expl.var = predictors30,
-                                      resp.xy = myRespXY,
-                                      resp.name = myRespName)
+                                       expl.var = predictors30,
+                                       resp.xy = myRespXY,
+                                       resp.name = myRespName)
 
 myBiomodData31 <- BIOMOD_FormatingData(resp.var = DataSpecies,
-                                      expl.var = predictors31,
-                                      resp.xy = myRespXY,
-                                      resp.name = myRespName)
+                                       expl.var = predictors31,
+                                       resp.xy = myRespXY,
+                                       resp.name = myRespName)
 
-## Definindo opções de modelos usando opções padrão
+
+## Setting template options using default options
 myBiomodOption <- BIOMOD_ModelingOptions()
 myBiomodOption
 
- 
 
-## Computando os modelos
+## Computing the models
 myBiomodModelOut1 <- BIOMOD_Modeling(myBiomodData1,
                                      models = c('RF'), 
                                      bm.options = myBiomodOption,
@@ -519,7 +515,7 @@ myBiomodModelOut1 <- BIOMOD_Modeling(myBiomodData1,
                                      metric.eval = 'TSS',                                   
                                      scale.models = TRUE,
                                      modeling.id = paste(myRespName,"Model1",sep=""))
-                                     
+
 
 myBiomodModelOut1
 
@@ -628,305 +624,304 @@ myBiomodModelOut9 <- BIOMOD_Modeling(myBiomodData9,
 myBiomodModelOut9
 
 myBiomodModelOut10 <- BIOMOD_Modeling(myBiomodData10,
-                                     models = c('RF'), 
-                                     bm.options = myBiomodOption,
-                                     CV.strategy = 'random',
-                                     CV.nb.rep = 20,
-                                     CV.perc = 0.7,
-                                     var.import= 10,
-                                     metric.eval = 'TSS',                                   
-                                     scale.models = TRUE,
-                                     modeling.id = paste(myRespName,"Model10",sep=""))
+                                      models = c('RF'), 
+                                      bm.options = myBiomodOption,
+                                      CV.strategy = 'random',
+                                      CV.nb.rep = 20,
+                                      CV.perc = 0.7,
+                                      var.import= 10,
+                                      metric.eval = 'TSS',                                   
+                                      scale.models = TRUE,
+                                      modeling.id = paste(myRespName,"Model10",sep=""))
 
 myBiomodModelOut10
 
 myBiomodModelOut11 <- BIOMOD_Modeling(myBiomodData11,
-                                     models = c('RF'), 
-                                     bm.options = myBiomodOption,
-                                     CV.strategy = 'random',
-                                     CV.nb.rep = 20,
-                                     CV.perc = 0.7,
-                                     var.import= 10,
-                                     metric.eval = 'TSS',                                   
-                                     scale.models = TRUE,
-                                     modeling.id = paste(myRespName,"Model11",sep=""))
+                                      models = c('RF'), 
+                                      bm.options = myBiomodOption,
+                                      CV.strategy = 'random',
+                                      CV.nb.rep = 20,
+                                      CV.perc = 0.7,
+                                      var.import= 10,
+                                      metric.eval = 'TSS',                                   
+                                      scale.models = TRUE,
+                                      modeling.id = paste(myRespName,"Model11",sep=""))
 
 myBiomodModelOut11
 
 myBiomodModelOut12 <- BIOMOD_Modeling(myBiomodData12,
-                                     models = c('RF'), 
-                                     bm.options = myBiomodOption,
-                                     CV.strategy = 'random',
-                                     CV.nb.rep = 20,
-                                     CV.perc = 0.7,
-                                     var.import= 10,
-                                     metric.eval = 'TSS',                                   
-                                     scale.models = TRUE,
-                                     modeling.id = paste(myRespName,"Model12",sep=""))
+                                      models = c('RF'), 
+                                      bm.options = myBiomodOption,
+                                      CV.strategy = 'random',
+                                      CV.nb.rep = 20,
+                                      CV.perc = 0.7,
+                                      var.import= 10,
+                                      metric.eval = 'TSS',                                   
+                                      scale.models = TRUE,
+                                      modeling.id = paste(myRespName,"Model12",sep=""))
 
 myBiomodModelOut12
 
 myBiomodModelOut13 <- BIOMOD_Modeling(myBiomodData13,
-                                     models = c('RF'), 
-                                     bm.options = myBiomodOption,
-                                     CV.strategy = 'random',
-                                     CV.nb.rep = 20,
-                                     CV.perc = 0.7,
-                                     var.import= 10,
-                                     metric.eval = 'TSS',                                   
-                                     scale.models = TRUE,
-                                     modeling.id = paste(myRespName,"Model13",sep=""))
+                                      models = c('RF'), 
+                                      bm.options = myBiomodOption,
+                                      CV.strategy = 'random',
+                                      CV.nb.rep = 20,
+                                      CV.perc = 0.7,
+                                      var.import= 10,
+                                      metric.eval = 'TSS',                                   
+                                      scale.models = TRUE,
+                                      modeling.id = paste(myRespName,"Model13",sep=""))
 
 myBiomodModelOut13
 
 myBiomodModelOut14 <- BIOMOD_Modeling(myBiomodData14,
-                                     models = c('RF'), 
-                                     bm.options = myBiomodOption,
-                                     CV.strategy = 'random',
-                                     CV.nb.rep = 20,
-                                     CV.perc = 0.7,
-                                     var.import= 10,
-                                     metric.eval = 'TSS',                                   
-                                     scale.models = TRUE,
-                                     modeling.id = paste(myRespName,"Model14",sep=""))
+                                      models = c('RF'), 
+                                      bm.options = myBiomodOption,
+                                      CV.strategy = 'random',
+                                      CV.nb.rep = 20,
+                                      CV.perc = 0.7,
+                                      var.import= 10,
+                                      metric.eval = 'TSS',                                   
+                                      scale.models = TRUE,
+                                      modeling.id = paste(myRespName,"Model14",sep=""))
 
 myBiomodModelOut14
 
 myBiomodModelOut15 <- BIOMOD_Modeling(myBiomodData15,
-                                     models = c('RF'), 
-                                     bm.options = myBiomodOption,
-                                     CV.strategy = 'random',
-                                     CV.nb.rep = 20,
-                                     CV.perc = 0.7,
-                                     var.import= 10,
-                                     metric.eval = 'TSS',                                   
-                                     scale.models = TRUE,
-                                     modeling.id = paste(myRespName,"Model15",sep=""))
+                                      models = c('RF'), 
+                                      bm.options = myBiomodOption,
+                                      CV.strategy = 'random',
+                                      CV.nb.rep = 20,
+                                      CV.perc = 0.7,
+                                      var.import= 10,
+                                      metric.eval = 'TSS',                                   
+                                      scale.models = TRUE,
+                                      modeling.id = paste(myRespName,"Model15",sep=""))
 
 myBiomodModelOut15
 
 myBiomodModelOut16 <- BIOMOD_Modeling(myBiomodData16,
-                                     models = c('RF'), 
-                                     bm.options = myBiomodOption,
-                                     CV.strategy = 'random',
-                                     CV.nb.rep = 20,
-                                     CV.perc = 0.7,
-                                     var.import= 10,
-                                     metric.eval = 'TSS',                                   
-                                     scale.models = TRUE,
-                                     modeling.id = paste(myRespName,"Model16",sep=""))
+                                      models = c('RF'), 
+                                      bm.options = myBiomodOption,
+                                      CV.strategy = 'random',
+                                      CV.nb.rep = 20,
+                                      CV.perc = 0.7,
+                                      var.import= 10,
+                                      metric.eval = 'TSS',                                   
+                                      scale.models = TRUE,
+                                      modeling.id = paste(myRespName,"Model16",sep=""))
 
 myBiomodModelOut16
 
 myBiomodModelOut17 <- BIOMOD_Modeling(myBiomodData17,
-                                     models = c('RF'), 
-                                     bm.options = myBiomodOption,
-                                     CV.strategy = 'random',
-                                     CV.nb.rep = 20,
-                                     CV.perc = 0.7,
-                                     var.import= 10,
-                                     metric.eval = 'TSS',                                   
-                                     scale.models = TRUE,
-                                     modeling.id = paste(myRespName,"Model17",sep=""))
+                                      models = c('RF'), 
+                                      bm.options = myBiomodOption,
+                                      CV.strategy = 'random',
+                                      CV.nb.rep = 20,
+                                      CV.perc = 0.7,
+                                      var.import= 10,
+                                      metric.eval = 'TSS',                                   
+                                      scale.models = TRUE,
+                                      modeling.id = paste(myRespName,"Model17",sep=""))
 
 myBiomodModelOut17
 
 myBiomodModelOut18 <- BIOMOD_Modeling(myBiomodData18,
-                                     models = c('RF'), 
-                                     bm.options = myBiomodOption,
-                                     CV.strategy = 'random',
-                                     CV.nb.rep = 20,
-                                     CV.perc = 0.7,
-                                     var.import= 10,
-                                     metric.eval ='TSS',                                   
-                                     scale.models = TRUE,
-                                     modeling.id = paste(myRespName,"Model18",sep=""))
+                                      models = c('RF'), 
+                                      bm.options = myBiomodOption,
+                                      CV.strategy = 'random',
+                                      CV.nb.rep = 20,
+                                      CV.perc = 0.7,
+                                      var.import= 10,
+                                      metric.eval ='TSS',                                   
+                                      scale.models = TRUE,
+                                      modeling.id = paste(myRespName,"Model18",sep=""))
 
 myBiomodModelOut18
 
 myBiomodModelOut19 <- BIOMOD_Modeling(myBiomodData19,
-                                     models = c('RF'), 
-                                     bm.options = myBiomodOption,
-                                     CV.strategy = 'random',
-                                     CV.nb.rep = 20,
-                                     CV.perc = 0.7,
-                                     var.import= 10,
-                                     metric.eval = 'TSS',                                   
-                                     scale.models = TRUE,
-                                     modeling.id = paste(myRespName,"Model19",sep=""))
+                                      models = c('RF'), 
+                                      bm.options = myBiomodOption,
+                                      CV.strategy = 'random',
+                                      CV.nb.rep = 20,
+                                      CV.perc = 0.7,
+                                      var.import= 10,
+                                      metric.eval = 'TSS',                                   
+                                      scale.models = TRUE,
+                                      modeling.id = paste(myRespName,"Model19",sep=""))
 
 myBiomodModelOut19
 
 myBiomodModelOut20 <- BIOMOD_Modeling(myBiomodData20,
-                                     models = c('RF'), 
-                                     bm.options = myBiomodOption,
-                                     CV.strategy = 'random',
-                                     CV.nb.rep = 20,
-                                     CV.perc = 0.7,
-                                     var.import= 10,
-                                     metric.eval = 'TSS',                                   
-                                     scale.models = TRUE,
-                                     modeling.id = paste(myRespName,"Model20",sep=""))
+                                      models = c('RF'), 
+                                      bm.options = myBiomodOption,
+                                      CV.strategy = 'random',
+                                      CV.nb.rep = 20,
+                                      CV.perc = 0.7,
+                                      var.import= 10,
+                                      metric.eval = 'TSS',                                   
+                                      scale.models = TRUE,
+                                      modeling.id = paste(myRespName,"Model20",sep=""))
 
 myBiomodModelOut20
 
 myBiomodModelOut21 <- BIOMOD_Modeling(myBiomodData21,
-                                     models = c('RF'), 
-                                     bm.options = myBiomodOption,
-                                     CV.strategy = 'random',
-                                     CV.nb.rep = 20,
-                                     CV.perc = 0.7,
-                                     var.import= 10,
-                                     metric.eval = 'TSS',                                   
-                                     scale.models = TRUE,
-                                     modeling.id = paste(myRespName,"Model21",sep=""))
+                                      models = c('RF'), 
+                                      bm.options = myBiomodOption,
+                                      CV.strategy = 'random',
+                                      CV.nb.rep = 20,
+                                      CV.perc = 0.7,
+                                      var.import= 10,
+                                      metric.eval = 'TSS',                                   
+                                      scale.models = TRUE,
+                                      modeling.id = paste(myRespName,"Model21",sep=""))
 
 myBiomodModelOut21
 
 myBiomodModelOut22 <- BIOMOD_Modeling(myBiomodData22,
-                                     models = c('RF'), 
-                                     bm.options = myBiomodOption,
-                                     CV.strategy = 'random',
-                                     CV.nb.rep = 20,
-                                     CV.perc = 0.7,
-                                     var.import= 10,
-                                     metric.eval = 'TSS',                                   
-                                     scale.models = TRUE,
-                                     modeling.id = paste(myRespName,"Model22",sep=""))
+                                      models = c('RF'), 
+                                      bm.options = myBiomodOption,
+                                      CV.strategy = 'random',
+                                      CV.nb.rep = 20,
+                                      CV.perc = 0.7,
+                                      var.import= 10,
+                                      metric.eval = 'TSS',                                   
+                                      scale.models = TRUE,
+                                      modeling.id = paste(myRespName,"Model22",sep=""))
 
 myBiomodModelOut22
 
 myBiomodModelOut23 <- BIOMOD_Modeling(myBiomodData23,
-                                     models = c('RF'), 
-                                     bm.options = myBiomodOption,
-                                     CV.strategy = 'random',
-                                     CV.nb.rep = 20,
-                                     CV.perc = 0.7,
-                                     var.import= 10,
-                                     metric.eval = 'TSS',                                   
-                                     scale.models = TRUE,
-                                     modeling.id = paste(myRespName,"Model23",sep=""))
+                                      models = c('RF'), 
+                                      bm.options = myBiomodOption,
+                                      CV.strategy = 'random',
+                                      CV.nb.rep = 20,
+                                      CV.perc = 0.7,
+                                      var.import= 10,
+                                      metric.eval = 'TSS',                                   
+                                      scale.models = TRUE,
+                                      modeling.id = paste(myRespName,"Model23",sep=""))
 
 myBiomodModelOut23
 
 myBiomodModelOut24 <- BIOMOD_Modeling(myBiomodData24,
-                                     models = c('RF'), 
-                                     bm.options = myBiomodOption,
-                                     CV.strategy = 'random',
-                                     CV.nb.rep = 20,
-                                     CV.perc = 0.7,
-                                     var.import= 10,
-                                     metric.eval = 'TSS',                                   
-                                     scale.models = TRUE,
-                                     modeling.id = paste(myRespName,"Model24",sep=""))
+                                      models = c('RF'), 
+                                      bm.options = myBiomodOption,
+                                      CV.strategy = 'random',
+                                      CV.nb.rep = 20,
+                                      CV.perc = 0.7,
+                                      var.import= 10,
+                                      metric.eval = 'TSS',                                   
+                                      scale.models = TRUE,
+                                      modeling.id = paste(myRespName,"Model24",sep=""))
 
 myBiomodModelOut24
 
 myBiomodModelOut25 <- BIOMOD_Modeling(myBiomodData25,
-                                     models = c('RF'), 
-                                     bm.options = myBiomodOption,
-                                     CV.strategy = 'random',
-                                     CV.nb.rep = 20,
-                                     CV.perc = 0.7,
-                                     var.import= 10,
-                                     metric.eval = 'TSS',                                   
-                                     scale.models = TRUE,
-                                     modeling.id = paste(myRespName,"Model25",sep=""))
+                                      models = c('RF'), 
+                                      bm.options = myBiomodOption,
+                                      CV.strategy = 'random',
+                                      CV.nb.rep = 20,
+                                      CV.perc = 0.7,
+                                      var.import= 10,
+                                      metric.eval = 'TSS',                                   
+                                      scale.models = TRUE,
+                                      modeling.id = paste(myRespName,"Model25",sep=""))
 
 myBiomodModelOut25
 
 myBiomodModelOut26 <- BIOMOD_Modeling(myBiomodData26,
-                                     models = c('RF'), 
-                                     bm.options = myBiomodOption,
-                                     CV.strategy = 'random',
-                                     CV.nb.rep = 20,
-                                     CV.perc = 0.7,
-                                     var.import= 10,
-                                     metric.eval = 'TSS',                                   
-                                     scale.models = TRUE,
-                                     modeling.id = paste(myRespName,"Model26",sep=""))
+                                      models = c('RF'), 
+                                      bm.options = myBiomodOption,
+                                      CV.strategy = 'random',
+                                      CV.nb.rep = 20,
+                                      CV.perc = 0.7,
+                                      var.import= 10,
+                                      metric.eval = 'TSS',                                   
+                                      scale.models = TRUE,
+                                      modeling.id = paste(myRespName,"Model26",sep=""))
 
 myBiomodModelOut26
 
 
 myBiomodModelOut27 <- BIOMOD_Modeling(myBiomodData27,
-                                     models = c('RF'), 
-                                     bm.options = myBiomodOption,
-                                     CV.strategy = 'random',
-                                     CV.nb.rep = 20,
-                                     CV.perc = 0.7,
-                                     var.import= 10,
-                                     metric.eval = 'TSS',                                   
-                                     scale.models = TRUE,
-                                     modeling.id = paste(myRespName,"Model27",sep=""))
+                                      models = c('RF'), 
+                                      bm.options = myBiomodOption,
+                                      CV.strategy = 'random',
+                                      CV.nb.rep = 20,
+                                      CV.perc = 0.7,
+                                      var.import= 10,
+                                      metric.eval = 'TSS',                                   
+                                      scale.models = TRUE,
+                                      modeling.id = paste(myRespName,"Model27",sep=""))
 
 myBiomodModelOut27
 
 myBiomodModelOut28 <- BIOMOD_Modeling(myBiomodData28,
-                                     models = c('RF'), 
-                                     bm.options = myBiomodOption,
-                                     CV.strategy = 'random',
-                                     CV.nb.rep = 20,
-                                     CV.perc = 0.7,
-                                     var.import= 10,
-                                     metric.eval = 'TSS',                                   
-                                     scale.models = TRUE,
-                                     modeling.id = paste(myRespName,"Model28",sep=""))
+                                      models = c('RF'), 
+                                      bm.options = myBiomodOption,
+                                      CV.strategy = 'random',
+                                      CV.nb.rep = 20,
+                                      CV.perc = 0.7,
+                                      var.import= 10,
+                                      metric.eval = 'TSS',                                   
+                                      scale.models = TRUE,
+                                      modeling.id = paste(myRespName,"Model28",sep=""))
 
 myBiomodModelOut28
 
 myBiomodModelOut29 <- BIOMOD_Modeling(myBiomodData29,
-                                     models = c('RF'), 
-                                     bm.options = myBiomodOption,
-                                     CV.strategy = 'random',
-                                     CV.nb.rep = 20,
-                                     CV.perc = 0.7,
-                                     var.import= 10,
-                                     metric.eval = 'TSS',                                   
-                                     scale.models = TRUE,
-                                     modeling.id = paste(myRespName,"Model29",sep=""))
+                                      models = c('RF'), 
+                                      bm.options = myBiomodOption,
+                                      CV.strategy = 'random',
+                                      CV.nb.rep = 20,
+                                      CV.perc = 0.7,
+                                      var.import= 10,
+                                      metric.eval = 'TSS',                                   
+                                      scale.models = TRUE,
+                                      modeling.id = paste(myRespName,"Model29",sep=""))
 
 myBiomodModelOut29
 
 myBiomodModelOut30 <- BIOMOD_Modeling(myBiomodData30,
-                                     models = c('RF'), 
-                                     bm.options = myBiomodOption,
-                                     CV.strategy = 'random',
-                                     CV.nb.rep = 20,
-                                     CV.perc = 0.7,
-                                     var.import= 10,
-                                     metric.eval = 'TSS',                                   
-                                     scale.models = TRUE,
-                                     modeling.id = paste(myRespName,"Model30",sep=""))
+                                      models = c('RF'), 
+                                      bm.options = myBiomodOption,
+                                      CV.strategy = 'random',
+                                      CV.nb.rep = 20,
+                                      CV.perc = 0.7,
+                                      var.import= 10,
+                                      metric.eval = 'TSS',                                   
+                                      scale.models = TRUE,
+                                      modeling.id = paste(myRespName,"Model30",sep=""))
 
 myBiomodModelOut30
 
 myBiomodModelOut31 <- BIOMOD_Modeling(myBiomodData31,
-                                     models = c('RF'), 
-                                     bm.options = myBiomodOption,
-                                     CV.strategy = 'random',
-                                     CV.nb.rep = 20,
-                                     CV.perc = 0.7,
-                                     var.import= 10,
-                                     metric.eval = 'TSS',                                   
-                                     scale.models = TRUE,
-                                     modeling.id = paste(myRespName,"Model31",sep=""))
+                                      models = c('RF'), 
+                                      bm.options = myBiomodOption,
+                                      CV.strategy = 'random',
+                                      CV.nb.rep = 20,
+                                      CV.perc = 0.7,
+                                      var.import= 10,
+                                      metric.eval = 'TSS',                                   
+                                      scale.models = TRUE,
+                                      modeling.id = paste(myRespName,"Model31",sep=""))
 
 myBiomodModelOut31
-
 
 
 ## MOdel evaluation
 
 
-# eval object
+# Eval object
 eval_myBiomodModelOut1<-as_tibble(get_evaluations(myBiomodModelOut1)) %>% 
   mutate(model = paste("model_1"),# grouping model Hypotesys
          preds = paste('bat + velc')) # paste preds
 
 eval_myBiomodModelOut2<-as_tibble(get_evaluations(myBiomodModelOut2)) %>% 
   mutate(model = paste("model_2"),
-         preds = paste('batimetria + sst'))
+         preds = paste('bat + sst'))
 
 eval_myBiomodModelOut3<-as_tibble(get_evaluations(myBiomodModelOut3)) %>% 
   mutate(model = paste("model_3"),
@@ -938,7 +933,7 @@ eval_myBiomodModelOut4<-as_tibble(get_evaluations(myBiomodModelOut4)) %>%
 
 eval_myBiomodModelOut5<-as_tibble(get_evaluations(myBiomodModelOut5)) %>% 
   mutate(model = paste("model_5"),
-         preds = paste('batimetria + distância primeiros focos'))
+         preds = paste('bat + dist_inv'))
 
 eval_myBiomodModelOut6<-as_tibble(get_evaluations(myBiomodModelOut6)) %>% 
   mutate(model = paste("model_6"),
@@ -954,7 +949,7 @@ eval_myBiomodModelOut8<-as_tibble(get_evaluations(myBiomodModelOut8)) %>%
 
 eval_myBiomodModelOut9<-as_tibble(get_evaluations(myBiomodModelOut9)) %>% 
   mutate(model = paste("model_9"),
-         preds = paste('velocidade corrente + sst'))
+         preds = paste('velc + sst'))
 
 eval_myBiomodModelOut10<-as_tibble(get_evaluations(myBiomodModelOut10)) %>% 
   mutate(model = paste("model_10"),
@@ -966,7 +961,7 @@ eval_myBiomodModelOut11<-as_tibble(get_evaluations(myBiomodModelOut11)) %>%
 
 eval_myBiomodModelOut12<-as_tibble(get_evaluations(myBiomodModelOut12)) %>% 
   mutate(model = paste("model_12"),
-         preds = paste('velocidade corrente + distância primeiros focos'))
+         preds = paste('velc + dist_inv'))
 
 eval_myBiomodModelOut13<-as_tibble(get_evaluations(myBiomodModelOut13)) %>% 
   mutate(model = paste("model_13"),
@@ -974,15 +969,15 @@ eval_myBiomodModelOut13<-as_tibble(get_evaluations(myBiomodModelOut13)) %>%
 
 eval_myBiomodModelOut14<-as_tibble(get_evaluations(myBiomodModelOut14)) %>% 
   mutate(model = paste("model_14"),
-         preds = paste('velocidade corrente + distância portos e marinas'))
+         preds = paste('velc + d_mar'))
 
 eval_myBiomodModelOut15<-as_tibble(get_evaluations(myBiomodModelOut15)) %>% 
   mutate(model = paste("model_15"),
-         preds = paste('sst + distância portos e marinas'))
+         preds = paste('sst + d_mar'))
 
 eval_myBiomodModelOut16<-as_tibble(get_evaluations(myBiomodModelOut16)) %>% 
   mutate(model = paste("model_16"),
-         preds = paste('mhw + distância portos e marinas'))
+         preds = paste('mhw + d_mar'))
 
 eval_myBiomodModelOut17<-as_tibble(get_evaluations(myBiomodModelOut17)) %>% 
   mutate(model = paste("model_17"),
@@ -990,11 +985,11 @@ eval_myBiomodModelOut17<-as_tibble(get_evaluations(myBiomodModelOut17)) %>%
 
 eval_myBiomodModelOut18<-as_tibble(get_evaluations(myBiomodModelOut18)) %>% 
   mutate(model = paste("model_18"),
-         preds = paste('mcs + distância portos e marinas'))
+         preds = paste('mcs + d_mar'))
 
 eval_myBiomodModelOut19<-as_tibble(get_evaluations(myBiomodModelOut19)) %>% 
   mutate(model = paste("model_19"),
-         preds = paste('distância primeiros focos + distância portos e marinas'))
+         preds = paste('dist_inv + d_mar'))
 
 eval_myBiomodModelOut20<-as_tibble(get_evaluations(myBiomodModelOut20)) %>% 
   mutate(model = paste("model_20"),
@@ -1046,40 +1041,40 @@ eval_myBiomodModelOut31<-as_tibble(get_evaluations(myBiomodModelOut31)) %>%
 
 
 eval_list <-  list(eval_myBiomodModelOut1,
-                  eval_myBiomodModelOut2,
-                  eval_myBiomodModelOut3,
-                  eval_myBiomodModelOut4,
-                  eval_myBiomodModelOut5,
-                  eval_myBiomodModelOut6,
-                  eval_myBiomodModelOut7,
-                  eval_myBiomodModelOut8,
-                  eval_myBiomodModelOut9,
-                  eval_myBiomodModelOut10,
-                  eval_myBiomodModelOut11,
-                  eval_myBiomodModelOut12,
-                  eval_myBiomodModelOut13,
-                  eval_myBiomodModelOut14,
-                  eval_myBiomodModelOut15,
-                  eval_myBiomodModelOut16,
-                  eval_myBiomodModelOut17,
-                  eval_myBiomodModelOut18,
-                  eval_myBiomodModelOut19,
-                  eval_myBiomodModelOut20,
-                  eval_myBiomodModelOut21,
-                  eval_myBiomodModelOut22,
-                  eval_myBiomodModelOut23,
-                  eval_myBiomodModelOut24,
-                  eval_myBiomodModelOut25,
-                  eval_myBiomodModelOut26,
-                  eval_myBiomodModelOut27,
-                  eval_myBiomodModelOut28,
-                  eval_myBiomodModelOut29,
-                  eval_myBiomodModelOut30,
-                  eval_myBiomodModelOut31)
+                   eval_myBiomodModelOut2,
+                   eval_myBiomodModelOut3,
+                   eval_myBiomodModelOut4,
+                   eval_myBiomodModelOut5,
+                   eval_myBiomodModelOut6,
+                   eval_myBiomodModelOut7,
+                   eval_myBiomodModelOut8,
+                   eval_myBiomodModelOut9,
+                   eval_myBiomodModelOut10,
+                   eval_myBiomodModelOut11,
+                   eval_myBiomodModelOut12,
+                   eval_myBiomodModelOut13,
+                   eval_myBiomodModelOut14,
+                   eval_myBiomodModelOut15,
+                   eval_myBiomodModelOut16,
+                   eval_myBiomodModelOut17,
+                   eval_myBiomodModelOut18,
+                   eval_myBiomodModelOut19,
+                   eval_myBiomodModelOut20,
+                   eval_myBiomodModelOut21,
+                   eval_myBiomodModelOut22,
+                   eval_myBiomodModelOut23,
+                   eval_myBiomodModelOut24,
+                   eval_myBiomodModelOut25,
+                   eval_myBiomodModelOut26,
+                   eval_myBiomodModelOut27,
+                   eval_myBiomodModelOut28,
+                   eval_myBiomodModelOut29,
+                   eval_myBiomodModelOut30,
+                   eval_myBiomodModelOut31)
 str(eval_myBiomodModelOut5)
 
 # Combining eval tables ordering by the higher values
-# of average ROC across the model runs 
+# of average TSS across the model runs 
 eval_list_table <- eval_list %>% 
   # bind tables by row
   bind_rows() %>% 
@@ -1093,127 +1088,77 @@ eval_list_table <- eval_list %>%
             avg_TSS = round((mean(sensitivity) + mean(specificity) - 100), digits = 3)) %>% 
   arrange(-avg_validation) %>% 
   ungroup()
-  
+
+
 eval_list_table
-save(eval_list_table, myBiomodModelOut5, file = "modelling_result_data_20240410.RData")
+#save(eval_list_table, myBiomodModelOut5, file = "modelling_result_data_20240410.RData") #Save the modelling data
+
 
 ##Plotting the eval list table
-eval_models_df <- data.table(do.call(cbind, eval_list_table))
-mytheme <- ttheme_default(base_size = 10, base_colour = 'black', base_family = "TT Times New Roman",
-                          parse = FALSE, padding = unit(c(3, 3), "mm",))
-grid.table(eval_models_df[1:10,],  theme = mytheme)
-save(grid.table, file = "eval_models_table_20240410.Rplot")
-
-## Obtendo a importância das variáveis
-varimp <- get_variables_importance(myBiomodModelOut5)
-str(varimp)
-                            
-# Model that had the best performance 
-
-#Represent evaluation scores & variables importance
-bm_PlotEvalMean(bm.out = myBiomodModelOut5)
-
-# TSS and ROC By run
-#bm_PlotEvalBoxplot(bm.out = myBiomodModelOut5,group.by = c('algo', 'run')) # change to dot chart y 0-1
-ggplot(eval_myBiomodModelOut5, aes(x = run, y = calibration)) +
-  geom_point(color = 'dark blue', fill = 'light blue') +
-  labs(x = 'Rounds', y = 'Calibration') +
-  coord_flip() +
-  theme_light(base_size = 10)
-
-# Variable importance
-#bm_PlotVarImpBoxplot(bm.out = myBiomodModelOut5, group.by = c('expl.var', 'algo','algo'))
-ggplot(varimp, aes(x = expl.var, y = var.imp)) +
-  labs(x = 'Predictor', y = 'Importance', title = 'The importance of the predictors in the model') +
-  geom_boxplot(color = 'slategray', fill = 'lightblue1') +
-  theme_light(base_size = 10)
-
-colours()
-
-
-# just view, not for the report
-bm_PlotVarImpBoxplot(bm.out = myBiomodModelOut5, group.by = c('expl.var', 'algo', 'run'))
-
-# just view
-bm_PlotVarImpBoxplot(bm.out = myBiomodModelOut5, group.by = c('algo', 'expl.var', 'run'))
-
-
-# aprimorar
-bm_PlotResponseCurves(bm.out = myBiomodModelOut5,
-                      models.chosen = get_built_models(myBiomodModelOut5),
-                      fixed.var = 'median')
-
-
-bm_PlotResponseCurves(bm.out = myBiomodModelOut5, 
-                      models.chosen = get_built_models(myBiomodModelOut5),
-                      fixed.var = 'min')
-
-
-bm_PlotResponseCurves(bm.out = myBiomodModelOut5,
-                      models.chosen = get_built_models(myBiomodModelOut5),
-                      fixed.var = 'median',
-                      do.bivariate = TRUE)
-=======
-eval_list_table 
-
 eval_models_df <- data.table(do.call(cbind, eval_list_table))
 eval_models_df <- eval_models_df[, c(4,5,9)] 
 names(eval_models_df) <- c("Modelo", "Validação", "TSS Médio")
 
 mytheme <- ttheme_default(base_size = 10, 
                           base_colour = '#043480', 
-                          base_family = "Arial",
+                          base_family = "TT Times New Roman",
                           parse = FALSE, 
                           padding = unit(c(3, 3), "mm",))
+grid.table(eval_models_df[1:10,],  theme = mytheme)
 
-grid.table(eval_models_df[1:10, ],  theme = mytheme)
+eval_list_table 
 
-### Figures
+## Importance of variables
+varimp <- get_variables_importance(myBiomodModelOut5)
+str(varimp)
 
-# Variable Importance
-var_imp_model5 <- get_variables_importance(myBiomodModelOut5)
+# Model that had the best performance 
 
-# boxplot
-var_imp_boxplot = var_imp_model5 %>% 
-  filter(algo == "RF") %>% 
-  ggplot(aes(x = expl.var, 
-             y = var.imp,
-             fill = expl.var
-              )) +
+#Represent evaluation scores & variables importance
+#bm_PlotEvalMean(bm.out = myBiomodModelOut5)
+
+# TSS and ROC By run
+#ggplot(eval_myBiomodModelOut5, aes(x = run, y = calibration)) +
+#geom_point(color = 'dark blue', fill = 'light blue') +
+#labs(x = 'Rounds', y = 'Calibration') +
+#coord_flip() +
+#theme_light(base_size = 10)
+
+# Variable importance
+varimp_box <- ggplot(varimp, aes(x = expl.var, y = var.imp, fill = expl.var)) +
+  labs(x = 'Preditor', y = 'Importância') +
+  ggtitle('Importância dos preditores no modelo') +
   geom_boxplot() +
-  scale_fill_manual(values=c('#536e99', '#db6d10' )) +
+  scale_fill_manual(values=c('lightblue1', '#db6d10' )) +
   scale_y_continuous(breaks = seq(0, 1, 0.1), 
                      labels = paste0(seq(0, 100, 10), "%"),
                      expand = c(0, 0)) + 
-  scale_x_discrete(labels = c("Batimetria (m)", "Distância primeiros focos (m)" )) +
-  ggtitle("Importância das Variáveis") +
-  xlab("") + 
-  ylab("") + 
-  theme(
-    panel.background = element_blank(),
-    axis.ticks.y = element_line(colour = "grey",
-                                linewidth = 0.8, linetype = "solid"),
-    axis.line.y = element_line(colour = "grey",
-                               linewidth = 0.8, linetype = "solid"),
-    axis.text.x = element_text(size = 13,  color = "#284b80" ),
-    axis.text.y = element_text(size = 15,  color = "grey" ),
-    axis.ticks.x = element_blank(),
-    legend.title = element_blank(),
-    legend.position="none",
-    legend.key = element_rect(fill = "white"),
-    plot.title = element_text(hjust = 0.5, size = 18, color ="#284b80" )
-    ) 
-    
-# Save
-var_imp_boxplot
+  scale_x_discrete(labels = c("Batimetria (m)", "Distância primeiros focos (m)"))+
+  theme_light(base_size = 10) +
+  theme(axis.text.x = element_text(size = 10,  color = "black" ),
+        axis.text.y = element_text(size = 10,  color = "black" ),
+        axis.title.y = element_text(vjust = 2, size = 10,  color = "black", face = "bold" ),
+        axis.title.x = element_text(vjust = -0.5, size = 10,  color = "black", face = "bold" ),
+        panel.border = element_rect(colour = NA),
+        panel.grid = element_line(colour = 'white'),
+        axis.line.x = element_line(colour = 'gray'),
+        axis.line.y = element_line(colour = 'gray'),
+        plot.title = element_text(vjust = 0.7, size = 13, color ="navyblue", face = "bold"),
+        legend.title = element_blank(),
+        legend.position="none",
+        legend.key = element_rect(fill = "white"))
+
+colors()
+# save
+varimp_box
 ggsave("pacs_figs/var_imp_boxplot.png", width = 10, height = 5, dpi = 300)
 
 # Response curve
 
 # get data from bm_PlotResponseCurves
 response_curves<- bm_PlotResponseCurves(bm.out = myBiomodModelOut5,
-                      models.chosen = get_built_models(myBiomodModelOut5)[c(1,3,5,7,9,11,13,15,17,19,21,23,25,27,29,31,33,35,37,39)],
-                      fixed.var = 'median')
+                                        models.chosen = get_built_models(myBiomodModelOut5)[c(1,3,5,7,9,11,13,15,17,19,21,23,25,27,29,31,33,35,37,39)],
+                                        fixed.var = 'median')
 
 
 response_curves_data <- response_curves$plot$data
@@ -1223,35 +1168,39 @@ library("foreach")
 palette <- viridis_pal(option = "viridis")(20)
 
 # plot
+# response curve of bat
 response_bat = response_curves_data %>%
   filter(expl.name == "bat") %>% 
   ggplot( aes(x = expl.val, y = pred.val, 
-                     color = pred.name)) +
+              color = pred.name)) +
   geom_line(size = 1) +
   scale_color_manual(values = palette) +
   scale_y_continuous(position="left", n.breaks = 10, expand = c(0, 0), limits = c(0,1)) +
-
-  labs(y = "Prediction", x = "Batimetria (m)") +
+  scale_x_continuous(position="bottom", n.breaks = 13, expand = c(0,0)) +
+  
+  labs(y = "Predição", x = "Batimetria (m)") +
+  ggtitle('Curva de Resposta - Batimetria') +
   theme(
     panel.background = element_blank(),
     axis.ticks.y = element_line(colour = "grey",
                                 linewidth = 0.8, linetype = "solid"),
     axis.line.y = element_line(colour = "grey",
-                                linewidth = 0.8, linetype = "solid"),
+                               linewidth = 0.8, linetype = "solid"),
     axis.ticks.x = element_line(colour = "grey",
                                 linewidth = 0.8, linetype = "solid"),
     axis.line.x = element_line(colour = "grey",
                                linewidth = 0.8, linetype = "solid"),
-    axis.text.x = element_text(size = 13,  color = "#284b80" ),
-    axis.text.y = element_text(size = 15,  color = "grey" ),
-    axis.title.y = element_text(size = 14,  color = "#284b80" ),
-    axis.title.x = element_text(size = 14,  color = "#284b80" ),
-    legend.position="none"
-    )
+    axis.text.x = element_text(size = 10,  color = "black" ),
+    axis.text.y = element_text(size = 10,  color = "black" ),
+    axis.title.y = element_text(vjust = 2, size = 10,  color = "black", face = "bold" ),
+    axis.title.x = element_text(vjust = -0.5, size = 10,  color = "black", face = "bold" ),
+    plot.title = element_text(vjust = 0.7, size = 13, color ="navyblue", face = "bold"),
+    legend.position="none")
 
 response_bat
 ggsave("pacs_figs/reponse_bat.png", width = 10, height = 5, dpi = 300)
-  
+
+#response curve of dist_inv
 response_dist_inv = response_curves_data %>%
   filter(expl.name == "dist_inv") %>% 
   ggplot( aes(x = expl.val/1000, y = pred.val, 
@@ -1261,7 +1210,8 @@ response_dist_inv = response_curves_data %>%
   scale_y_continuous(position="left", n.breaks = 10, expand = c(0, 0), limits = c(0,1)) +
   scale_x_continuous(position="bottom", n.breaks = 20, expand = c(0, 0)) +
   
-  labs(y = "Prediction", x = "Distance (Km)") +
+  labs(y = "Predição", x = "Distância primeiros focos (km)") +
+  ggtitle('Curva de Resposta - Distância primeiros focos') +
   theme(
     panel.background = element_blank(),
     axis.ticks.y = element_line(colour = "grey",
@@ -1272,23 +1222,24 @@ response_dist_inv = response_curves_data %>%
                                 linewidth = 0.8, linetype = "solid"),
     axis.line.x = element_line(colour = "grey",
                                linewidth = 0.8, linetype = "solid"),
-    axis.text.x = element_text(size = 13,  color = "#284b80" ),
-    axis.text.y = element_text(size = 15,  color = "grey" ),
-    axis.title.y = element_text(size = 14,  color = "#284b80" ),
-    axis.title.x = element_text(size = 14,  color = "#284b80" ),
-    legend.position="none"
-  )  
-  
+    axis.text.x = element_text(size = 10,  color = "black" ),
+    axis.text.y = element_text(size = 10,  color = "black" ),
+    axis.title.y = element_text(vjust = 2, size = 10,  color = "black", face = "bold" ),
+    axis.title.x = element_text(vjust = -0.5, size = 10,  color = "black", face = "bold" ),
+    plot.title = element_text(vjust = 0.7, size = 13, color ="navyblue", face = "bold"),
+    legend.position="none")
+
+
 response_dist_inv
 ggsave("pacs_figs/response_dist_inv.png", width = 10, height = 5, dpi = 300)
 
 
-# Response bivariate all models
 
+# Response bivariate all models
 response_curves_bivariate<- bm_PlotResponseCurves(bm.out = myBiomodModelOut5,
-                                        models.chosen = get_built_models(myBiomodModelOut5)[c(1,3,5,7,9,11,13,15,17,19,21,23,25,27,29,31,33,35,37,39)],
-                                        fixed.var = 'median',
-                                        do.bivariate = TRUE)
+                                                  models.chosen = get_built_models(myBiomodModelOut5)[c(1,3,5,7,9,11,13,15,17,19,21,23,25,27,29,31,33,35,37,39)],
+                                                  fixed.var = 'median',
+                                                  do.bivariate = TRUE)
 response_curves_bivariate_data = response_curves_bivariate$tab
 
 bat = response_curves_bivariate_data %>% 
@@ -1307,7 +1258,7 @@ names(data_biv) = c("bat", "dist", "pred")
 
 response_dist_inv_bivariate = ggplot(data_biv, aes(x = dist/1000, y = bat, fill=pred )) + 
   geom_tile() +
-  xlab("Distância da Invasão (Km)") +
+  xlab("Distância primeiros focos (km)") +
   ylab("Batimetria (m)") +
   labs(fill = "Predição") +
   scale_fill_continuous(n.breaks = 3, limits = c(0,1)) +
@@ -1321,53 +1272,16 @@ response_dist_inv_bivariate = ggplot(data_biv, aes(x = dist/1000, y = bat, fill=
                                linewidth = 0.8, linetype = "solid"),
     axis.line.x = element_line(colour = "grey",
                                linewidth = 0.8, linetype = "solid"),
-    axis.text.x = element_text(size = 14,  color = "#284b80" ),
-    axis.text.y = element_text(size = 14,  color = "#284b80" ),
-    axis.title.x = element_text(size = 16,  color = "#284b80" ),
-    axis.title.y = element_text(size = 16,  color = "#284b80" ),
-    axis.ticks.x = element_blank(), 
-    plot.title = element_text(hjust = 0.5, size = 18, color ="#284b80"),
-    legend.title = element_text(face = "bold", color = "#284b80"),
-    legend.text = element_text(color = "#284b80", size = 10),
-  )
+    axis.text.x = element_text(size = 10,  color = "black"),
+    axis.text.y = element_text(size = 10,  color = "black"),
+    axis.title.x = element_text(vjust = -0.5, size = 10,  color = "black", face = "bold" ),
+    axis.title.y = element_text(vjust = 2, size = 10,  color = "black", face = "bold" ),
+    axis.ticks.x = element_blank(),
+    legend.title = element_text(vjust = 2, face = "bold", color = "black"),
+    legend.text = element_text(color = "black", size = 10),)
 
 response_dist_inv_bivariate
 ggsave("pacs/response_dist_inv_bivariate.png", width = 10, height = 8, dpi = 300)
-
-
-################################################################################
-
-#### Cola formato
-scale_x_discrete(labels = c('Matacões e Paredões','Tocas e Fendas','Grutas', "Lages", "Rochas P e M")) +
-  geom_boxplot(lwd = 0.2) +
-  scale_y_continuous(position="left", n.breaks = 10, expand = c(0, 0.05)) +
-  ggtitle("Índice de Abragência Relativa das Geomorfologias (IAR GEO)") +
-  xlab("") +
-  labs(y = "IAR GEO") +
-  #geom_jitter(color="black", size=0.2, alpha=0.5) +
-  theme(
-    panel.background = element_blank(),
-    axis.ticks.y = element_line(colour = "grey",
-                                linewidth = 0.8, linetype = "solid"),
-    axis.line.y = element_line(colour = "grey",
-                               linewidth = 0.8, linetype = "solid"),
-    axis.text.x = element_text(size = 13,  color = "#284b80" ),
-    axis.text.y = element_text(size = 15,  color = "grey" ),
-    axis.title.y = element_text(size = 14,  color = "#284b80" ),
-    legend.position="none",
-    axis.ticks.x = element_blank(), 
-    plot.title = element_text(hjust = 0.5, size = 18, color ="#284b80" )
-  )
-
-
-bp_all_local
-ggsave("plots/geo_local.png", width = 10, height = 5, dpi = 300)
-
-####################################################################################
-
-
-
->>>>>>> thiago_dev
 
 
 # Projection # no need ensemble because is just one model. The projection make 
@@ -1400,5 +1314,38 @@ ProjRF <- raster("./Tubastraea.coccinea/proj_current/proj_Current_Tubastraea.coc
 plot(ProjRF/1000) # customize plot
 
 sessionInfo()
+
+###########
+
+# boxplot
+var_imp_boxplot = var_imp_model5 %>% 
+  filter(algo == "RF") %>% 
+  ggplot(aes(x = expl.var, 
+             y = var.imp,
+             fill = expl.var
+  )) +
+  geom_boxplot() +
+  scale_fill_manual(values=c('#536e99', '#db6d10' )) +
+  scale_y_continuous(breaks = seq(0, 1, 0.1), 
+                     labels = paste0(seq(0, 100, 10), "%"),
+                     expand = c(0, 0)) + 
+  scale_x_discrete(labels = c("Batimetria (m)", "Distância primeiros focos (m)" )) +
+  ggtitle("Importância das Variáveis") +
+  xlab("") + 
+  ylab("") + 
+  theme(
+    panel.background = element_blank(),
+    axis.ticks.y = element_line(colour = "grey",
+                                linewidth = 0.8, linetype = "solid"),
+    axis.line.y = element_line(colour = "grey",
+                               linewidth = 0.8, linetype = "solid"),
+    axis.text.x = element_text(size = 13,  color = "#284b80" ),
+    axis.text.y = element_text(size = 15,  color = "grey" ),
+    axis.ticks.x = element_blank(),
+    legend.title = element_blank(),
+    legend.position="none",
+    legend.key = element_rect(fill = "white"),
+    plot.title = element_text(hjust = 0.5, size = 18, color ="#284b80" )
+  ) 
 
 ################################################################################
