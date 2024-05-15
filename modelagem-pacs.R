@@ -1181,27 +1181,30 @@ var_imp_boxplot = var_imp_model5 %>%
              fill = expl.var
               )) +
   geom_boxplot() +
-  scale_fill_manual(values=c('#536e99', '#db6d10' )) +
+  scale_fill_manual(values=c('lightblue', 'orange' )) +
   scale_y_continuous(breaks = seq(0, 1, 0.1), 
                      labels = paste0(seq(0, 100, 10), "%"),
                      expand = c(0, 0)) + 
   scale_x_discrete(labels = c("Batimetria (m)", "Distância primeiros focos (m)" )) +
   ggtitle("Importância das Variáveis") +
-  xlab("") + 
-  ylab("") + 
+  xlab("Preditor") + 
+  ylab("Importância") + 
   theme(
     panel.background = element_blank(),
-    axis.ticks.y = element_line(colour = "grey",
-                                linewidth = 0.8, linetype = "solid"),
-    axis.line.y = element_line(colour = "grey",
-                               linewidth = 0.8, linetype = "solid"),
-    axis.text.x = element_text(size = 13,  color = "#284b80" ),
-    axis.text.y = element_text(size = 15,  color = "grey" ),
+    axis.ticks.y = element_line(colour = "darkgrey",
+                                linewidth = 0.5, linetype = "solid"),
+    axis.line.y = element_line(colour = "darkgrey",
+                               linewidth = 0.5, linetype = "solid"),
+    axis.line.x = element_line(colour = "darkgrey",
+                               linewidth = 0.5, linetype = "solid"),
+    axis.text.x = element_text(size = 10,  color = "black" ),
+    axis.text.y = element_text(size = 10,  color = "black" ),
     axis.ticks.x = element_blank(),
+    title = bold,
     legend.title = element_blank(),
     legend.position="none",
     legend.key = element_rect(fill = "white"),
-    plot.title = element_text(hjust = 0.5, size = 18, color ="#284b80" )
+    plot.title = element_text(hjust = 0.5, size = 15, color ="black" )
     ) 
     
 # Save
