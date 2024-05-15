@@ -1091,6 +1091,8 @@ eval_list_table <- eval_list %>%
 
 
 eval_list_table
+
+#Salvando o resultado do melhor modelo
 #save(eval_list_table, myBiomodModelOut5, file = "modelling_result_data_20240410.RData") #Save the modelling data
 
 
