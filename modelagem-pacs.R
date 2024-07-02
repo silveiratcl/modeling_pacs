@@ -1170,7 +1170,7 @@ response_bat = response_curves_data %>%
   scale_color_manual(values = palette) +
   scale_y_continuous(position="left", n.breaks = 10, expand = c(0, 0), limits = c(0,1)) +
 
-  labs(y = "Prediction", x = "Batimetria (m)") +
+  labs(y = "Predição", x = "Batimetria (m)") +
   theme(
     panel.background = element_blank(),
     axis.ticks.y = element_line(colour = "grey",
@@ -1200,7 +1200,7 @@ response_dist_inv = response_curves_data %>%
   scale_y_continuous(position="left", n.breaks = 10, expand = c(0, 0), limits = c(0,1)) +
   scale_x_continuous(position="bottom", n.breaks = 20, expand = c(0, 0)) +
   
-  labs(y = "Prediction", x = "Distance (Km)") +
+  labs(y = "Predição", x = "Distancia dos focos RN e Engenho (Km)") +
   theme(
     panel.background = element_blank(),
     axis.ticks.y = element_line(colour = "grey",
