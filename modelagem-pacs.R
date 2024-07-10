@@ -18,21 +18,21 @@ setwd("C:/Users/silve/OneDrive/Área de Trabalho/modeling_pacs_2024/modeling_pac
 
 
 ## Instalando os pacotes
-install.packages("raster")
-install.packages("sf")
-install.packages("terra")
-install.packages("sp")
-install.packages("gtools")
-install.packages("car")
-install.packages("psych")
-install.packages("mgcv")
-install.packages("biomod2")
-install.packages("dismo")
-install.packages("tidyterra")
-install.packages("ggtext")
-install.packages("data.table")
-install.packages("gridExtra")
-install.packages("tidyverse")  
+#install.packages("raster")
+#install.packages("sf")
+#install.packages("terra")
+#install.packages("sp")
+#install.packages("gtools")
+#install.packages("car")
+#install.packages("psych")
+#install.packages("mgcv")
+#install.packages("biomod2")
+#install.packages("dismo")
+#install.packages("tidyterra")
+#install.packages("ggtext")
+#install.packages("data.table")
+#install.packages("gridExtra")
+#install.packages("tidyverse")  
 
 
 ## Carregamento dos pacotes
@@ -502,6 +502,9 @@ myBiomodData31 <- BIOMOD_FormatingData(resp.var = DataSpecies,
                                       resp.xy = myRespXY,
                                       resp.name = myRespName)
 
+
+
+
 ## Definindo opções de modelos usando opções padrão
 myBiomodOption <- BIOMOD_ModelingOptions()
 myBiomodOption
@@ -913,6 +916,14 @@ myBiomodModelOut31 <- BIOMOD_Modeling(myBiomodData31,
                                      modeling.id = paste(myRespName,"Model31",sep=""))
 
 myBiomodModelOut31
+
+
+###### load data from 2024-04-10
+
+load("modelling_result_data_20240410.RData")
+
+
+#####
 
 
 
