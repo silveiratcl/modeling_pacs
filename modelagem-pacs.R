@@ -990,7 +990,7 @@ eval_myBiomodModelOut1<-as_tibble(get_evaluations(myBiomodModelOut1)) %>%
 
 eval_myBiomodModelOut2<-as_tibble(get_evaluations(myBiomodModelOut2)) %>% 
   mutate(model = paste("model_2"),
-         preds = paste('bat + sst'))
+         preds = paste('batimetria + sst'))
 
 eval_myBiomodModelOut3<-as_tibble(get_evaluations(myBiomodModelOut3)) %>% 
   mutate(model = paste("model_3"),
@@ -1002,7 +1002,7 @@ eval_myBiomodModelOut4<-as_tibble(get_evaluations(myBiomodModelOut4)) %>%
 
 eval_myBiomodModelOut5<-as_tibble(get_evaluations(myBiomodModelOut5)) %>% 
   mutate(model = paste("model_5"),
-         preds = paste('bat + dist_inv'))
+         preds = paste('batimetria + distância primeiros focos'))
 
 eval_myBiomodModelOut6<-as_tibble(get_evaluations(myBiomodModelOut6)) %>% 
   mutate(model = paste("model_6"),
@@ -1018,7 +1018,7 @@ eval_myBiomodModelOut8<-as_tibble(get_evaluations(myBiomodModelOut8)) %>%
 
 eval_myBiomodModelOut9<-as_tibble(get_evaluations(myBiomodModelOut9)) %>% 
   mutate(model = paste("model_9"),
-         preds = paste('velc + sst'))
+         preds = paste('velocidade corrente + sst'))
 
 eval_myBiomodModelOut10<-as_tibble(get_evaluations(myBiomodModelOut10)) %>% 
   mutate(model = paste("model_10"),
@@ -1030,7 +1030,7 @@ eval_myBiomodModelOut11<-as_tibble(get_evaluations(myBiomodModelOut11)) %>%
 
 eval_myBiomodModelOut12<-as_tibble(get_evaluations(myBiomodModelOut12)) %>% 
   mutate(model = paste("model_12"),
-         preds = paste('velc + dist_inv'))
+         preds = paste('velocidade corrente + distância primeiros focos'))
 
 eval_myBiomodModelOut13<-as_tibble(get_evaluations(myBiomodModelOut13)) %>% 
   mutate(model = paste("model_13"),
@@ -1038,15 +1038,23 @@ eval_myBiomodModelOut13<-as_tibble(get_evaluations(myBiomodModelOut13)) %>%
 
 eval_myBiomodModelOut14<-as_tibble(get_evaluations(myBiomodModelOut14)) %>% 
   mutate(model = paste("model_14"),
-         preds = paste('velc + d_mar'))
+         preds = paste('velocidade corrente + distância portos e marinas'))
 
 eval_myBiomodModelOut15<-as_tibble(get_evaluations(myBiomodModelOut15)) %>% 
   mutate(model = paste("model_15"),
+<<<<<<< HEAD
          preds = paste('velc + d_traf'))
 
 eval_myBiomodModelOut16<-as_tibble(get_evaluations(myBiomodModelOut16)) %>% 
   mutate(model = paste("model_16"),
          preds = paste('sst + dist_inv'))
+=======
+         preds = paste('sst + distância portos e marinas'))
+
+eval_myBiomodModelOut16<-as_tibble(get_evaluations(myBiomodModelOut16)) %>% 
+  mutate(model = paste("model_16"),
+         preds = paste('mhw + distância portos e marinas'))
+>>>>>>> f8144389f8c612cb5399bf60aaa79b9fb369d3cf
 
 eval_myBiomodModelOut17<-as_tibble(get_evaluations(myBiomodModelOut17)) %>% 
   mutate(model = paste("model_17"),
@@ -1054,11 +1062,19 @@ eval_myBiomodModelOut17<-as_tibble(get_evaluations(myBiomodModelOut17)) %>%
 
 eval_myBiomodModelOut18<-as_tibble(get_evaluations(myBiomodModelOut18)) %>% 
   mutate(model = paste("model_18"),
+<<<<<<< HEAD
          preds = paste('sst + d_traf'))
 
 eval_myBiomodModelOut19<-as_tibble(get_evaluations(myBiomodModelOut19)) %>% 
   mutate(model = paste("model_19"),
          preds = paste('mhw + d_mar'))
+=======
+         preds = paste('mcs + distância portos e marinas'))
+
+eval_myBiomodModelOut19<-as_tibble(get_evaluations(myBiomodModelOut19)) %>% 
+  mutate(model = paste("model_19"),
+         preds = paste('distância primeiros focos + distância portos e marinas'))
+>>>>>>> f8144389f8c612cb5399bf60aaa79b9fb369d3cf
 
 eval_myBiomodModelOut20<-as_tibble(get_evaluations(myBiomodModelOut20)) %>% 
   mutate(model = paste("model_20"),
@@ -1271,27 +1287,30 @@ var_imp_boxplot = var_imp_model5 %>%
              fill = expl.var
               )) +
   geom_boxplot() +
-  scale_fill_manual(values=c('#536e99', '#db6d10' )) +
+  scale_fill_manual(values=c('lightblue', 'orange' )) +
   scale_y_continuous(breaks = seq(0, 1, 0.1), 
                      labels = paste0(seq(0, 100, 10), "%"),
                      expand = c(0, 0)) + 
   scale_x_discrete(labels = c("Batimetria (m)", "Distância primeiros focos (m)" )) +
   ggtitle("Importância das Variáveis") +
-  xlab("") + 
-  ylab("") + 
+  xlab("Preditor") + 
+  ylab("Importância") + 
   theme(
     panel.background = element_blank(),
-    axis.ticks.y = element_line(colour = "grey",
-                                linewidth = 0.8, linetype = "solid"),
-    axis.line.y = element_line(colour = "grey",
-                               linewidth = 0.8, linetype = "solid"),
-    axis.text.x = element_text(size = 13,  color = "#284b80" ),
-    axis.text.y = element_text(size = 15,  color = "grey" ),
+    axis.ticks.y = element_line(colour = "darkgrey",
+                                linewidth = 0.5, linetype = "solid"),
+    axis.line.y = element_line(colour = "darkgrey",
+                               linewidth = 0.5, linetype = "solid"),
+    axis.line.x = element_line(colour = "darkgrey",
+                               linewidth = 0.5, linetype = "solid"),
+    axis.text.x = element_text(size = 10,  color = "black" ),
+    axis.text.y = element_text(size = 10,  color = "black" ),
     axis.ticks.x = element_blank(),
+    title = bold,
     legend.title = element_blank(),
     legend.position="none",
     legend.key = element_rect(fill = "white"),
-    plot.title = element_text(hjust = 0.5, size = 18, color ="#284b80" )
+    plot.title = element_text(hjust = 0.5, size = 15, color ="black" )
     ) 
     
 # Save
