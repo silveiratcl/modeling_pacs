@@ -552,7 +552,6 @@ myBiomodModelOut1 <- BIOMOD_Modeling(myBiomodData1,
                                      scale.models = TRUE,
                                      modeling.id = paste(myRespName,"Model1",sep=""))
                                      
-
 str(myBiomodModelOut1)
 
 myBiomodModelOut2 <- BIOMOD_Modeling(myBiomodData2,
@@ -988,13 +987,19 @@ eval_myBiomodModelOut1<-as_tibble(get_evaluations(myBiomodModelOut1)) %>%
   mutate(model = paste("model_1"),# grouping model Hypotesys
          preds = paste('bat + velc')) # paste preds
 
+print(eval_myBiomodModelOut1, n = 21)
+
 eval_myBiomodModelOut2<-as_tibble(get_evaluations(myBiomodModelOut2)) %>% 
   mutate(model = paste("model_2"),
          preds = paste('batimetria + sst'))
 
+print(eval_myBiomodModelOut2, n = 21)
+
 eval_myBiomodModelOut3<-as_tibble(get_evaluations(myBiomodModelOut3)) %>% 
   mutate(model = paste("model_3"),
          preds = paste('bat + mhw'))
+
+print(eval_myBiomodModelOut3, n = 21)
 
 eval_myBiomodModelOut4<-as_tibble(get_evaluations(myBiomodModelOut4)) %>% 
   mutate(model = paste("model_4"),
@@ -1002,7 +1007,7 @@ eval_myBiomodModelOut4<-as_tibble(get_evaluations(myBiomodModelOut4)) %>%
 
 eval_myBiomodModelOut5<-as_tibble(get_evaluations(myBiomodModelOut5)) %>% 
   mutate(model = paste("model_5"),
-         preds = paste('batimetria + distância primeiros focos'))
+         preds = paste('bat + dist_inv'))
 
 eval_myBiomodModelOut6<-as_tibble(get_evaluations(myBiomodModelOut6)) %>% 
   mutate(model = paste("model_6"),
@@ -1018,7 +1023,7 @@ eval_myBiomodModelOut8<-as_tibble(get_evaluations(myBiomodModelOut8)) %>%
 
 eval_myBiomodModelOut9<-as_tibble(get_evaluations(myBiomodModelOut9)) %>% 
   mutate(model = paste("model_9"),
-         preds = paste('velocidade corrente + sst'))
+         preds = paste('velc + sst'))
 
 eval_myBiomodModelOut10<-as_tibble(get_evaluations(myBiomodModelOut10)) %>% 
   mutate(model = paste("model_10"),
@@ -1030,7 +1035,7 @@ eval_myBiomodModelOut11<-as_tibble(get_evaluations(myBiomodModelOut11)) %>%
 
 eval_myBiomodModelOut12<-as_tibble(get_evaluations(myBiomodModelOut12)) %>% 
   mutate(model = paste("model_12"),
-         preds = paste('velocidade corrente + distância primeiros focos'))
+         preds = paste('velc + dist_inv'))
 
 eval_myBiomodModelOut13<-as_tibble(get_evaluations(myBiomodModelOut13)) %>% 
   mutate(model = paste("model_13"),
@@ -1038,23 +1043,15 @@ eval_myBiomodModelOut13<-as_tibble(get_evaluations(myBiomodModelOut13)) %>%
 
 eval_myBiomodModelOut14<-as_tibble(get_evaluations(myBiomodModelOut14)) %>% 
   mutate(model = paste("model_14"),
-         preds = paste('velocidade corrente + distância portos e marinas'))
+         preds = paste('velc + d_mar'))
 
 eval_myBiomodModelOut15<-as_tibble(get_evaluations(myBiomodModelOut15)) %>% 
   mutate(model = paste("model_15"),
-<<<<<<< HEAD
          preds = paste('velc + d_traf'))
 
 eval_myBiomodModelOut16<-as_tibble(get_evaluations(myBiomodModelOut16)) %>% 
   mutate(model = paste("model_16"),
          preds = paste('sst + dist_inv'))
-=======
-         preds = paste('sst + distância portos e marinas'))
-
-eval_myBiomodModelOut16<-as_tibble(get_evaluations(myBiomodModelOut16)) %>% 
-  mutate(model = paste("model_16"),
-         preds = paste('mhw + distância portos e marinas'))
->>>>>>> f8144389f8c612cb5399bf60aaa79b9fb369d3cf
 
 eval_myBiomodModelOut17<-as_tibble(get_evaluations(myBiomodModelOut17)) %>% 
   mutate(model = paste("model_17"),
@@ -1062,19 +1059,11 @@ eval_myBiomodModelOut17<-as_tibble(get_evaluations(myBiomodModelOut17)) %>%
 
 eval_myBiomodModelOut18<-as_tibble(get_evaluations(myBiomodModelOut18)) %>% 
   mutate(model = paste("model_18"),
-<<<<<<< HEAD
          preds = paste('sst + d_traf'))
 
 eval_myBiomodModelOut19<-as_tibble(get_evaluations(myBiomodModelOut19)) %>% 
   mutate(model = paste("model_19"),
          preds = paste('mhw + d_mar'))
-=======
-         preds = paste('mcs + distância portos e marinas'))
-
-eval_myBiomodModelOut19<-as_tibble(get_evaluations(myBiomodModelOut19)) %>% 
-  mutate(model = paste("model_19"),
-         preds = paste('distância primeiros focos + distância portos e marinas'))
->>>>>>> f8144389f8c612cb5399bf60aaa79b9fb369d3cf
 
 eval_myBiomodModelOut20<-as_tibble(get_evaluations(myBiomodModelOut20)) %>% 
   mutate(model = paste("model_20"),
@@ -1187,17 +1176,16 @@ str(eval_myBiomodModelOut5)
 # Combining eval tables ordering by the higher values
 # of average ROC across the model runs 
 eval_list_table <- eval_list %>% 
-  bind_rows() %>% 
-  group_by(model, algo, metric.eval, preds) %>%
-  summarise(avg_validation = mean(validation),
-            sd_validation = round(sd(validation), digits = 3),
-            avg_sensitivity = round(mean(sensitivity), digits = 3),
-            avg_specificity = round(mean(specificity), digits = 3),
+  bind_rows(eval_list) %>%
+    group_by(model, preds) %>%
+  summarise(avg_validation = mean(validation, na.rm = TRUE),
+            sd_validation = round(sd(validation, na.rm = TRUE), digits = 3),
+            avg_sensitivity = round(mean(sensitivity, na.rm = TRUE), digits = 3),
+            avg_specificity = round(mean(specificity, na.rm = TRUE), digits = 3),
             avg_TSS = round((mean(sensitivity) + mean(specificity) - 100), digits = 3)) %>% 
-  arrange(-avg_validation) %>% 
-  ungroup()
+  arrange(-avg_validation)
   
-eval_list_table
+print(eval_list_table)
 
 #Salvando o resultado do melhor modelo
 save(eval_list_table, myBiomodModelOut5, file = "modelling_result_data_20240410.RData")
@@ -1209,57 +1197,8 @@ mytheme <- ttheme_default(base_size = 10, base_colour = 'black', base_family = "
 grid.table(eval_models_df[1:10,],  theme = mytheme)
 save(grid.table, file = "eval_models_table_20240410.Rplot")
 
+#OU
 
-#Modelo com a melhor performance
-
-#Obtendo a importância das variáveis
-varimp <- get_variables_importance(myBiomodModelOut5)
-str(varimp)
-
-#Represent evaluation scores & variables importance
-bm_PlotEvalMean(bm.out = myBiomodModelOut5)
-
-# TSS and ROC By run
-#bm_PlotEvalBoxplot(bm.out = myBiomodModelOut5,group.by = c('algo', 'run')) # change to dot chart y 0-1
-ggplot(eval_myBiomodModelOut5, aes(x = run, y = calibration)) +
-  geom_point(color = 'dark blue', fill = 'light blue') +
-  labs(x = 'Rounds', y = 'Calibration') +
-  coord_flip() +
-  theme_light(base_size = 10)
-
-# Variable importance
-#bm_PlotVarImpBoxplot(bm.out = myBiomodModelOut5, group.by = c('expl.var', 'algo','algo'))
-ggplot(varimp, aes(x = expl.var, y = var.imp)) +
-  labs(x = 'Predictor', y = 'Importance', title = 'The importance of the predictors in the model') +
-  geom_boxplot(color = 'slategray', fill = 'lightblue1') +
-  theme_light(base_size = 10)
-
-colours()
-
-
-# just view, not for the report
-bm_PlotVarImpBoxplot(bm.out = myBiomodModelOut5, group.by = c('expl.var', 'algo', 'run'))
-
-# just view
-bm_PlotVarImpBoxplot(bm.out = myBiomodModelOut5, group.by = c('algo', 'expl.var', 'run'))
-
-
-# aprimorar
-bm_PlotResponseCurves(bm.out = myBiomodModelOut5,
-                      models.chosen = get_built_models(myBiomodModelOut5),
-                      fixed.var = 'median')
-
-
-bm_PlotResponseCurves(bm.out = myBiomodModelOut5, 
-                      models.chosen = get_built_models(myBiomodModelOut5),
-                      fixed.var = 'min')
-
-
-bm_PlotResponseCurves(bm.out = myBiomodModelOut5,
-                      models.chosen = get_built_models(myBiomodModelOut5),
-                      fixed.var = 'median',
-                      do.bivariate = TRUE)
-=======
 eval_list_table 
 
 eval_models_df <- data.table(do.call(cbind, eval_list_table))
@@ -1273,6 +1212,13 @@ mytheme <- ttheme_default(base_size = 10,
                           padding = unit(c(3, 3), "mm",))
 
 grid.table(eval_models_df[1:10, ],  theme = mytheme)
+
+
+#Modelo com a melhor performance
+
+#Obtendo a importância das variáveis
+varimp <- get_variables_importance(myBiomodModelOut5)
+str(varimp)
 
 ### Figures
 
@@ -1306,7 +1252,6 @@ var_imp_boxplot = var_imp_model5 %>%
     axis.text.x = element_text(size = 10,  color = "black" ),
     axis.text.y = element_text(size = 10,  color = "black" ),
     axis.ticks.x = element_blank(),
-    title = bold,
     legend.title = element_blank(),
     legend.position="none",
     legend.key = element_rect(fill = "white"),
@@ -1321,11 +1266,14 @@ ggsave("pacs_figs/var_imp_boxplot.png", width = 10, height = 5, dpi = 300)
 
 # get data from bm_PlotResponseCurves
 response_curves<- bm_PlotResponseCurves(bm.out = myBiomodModelOut5,
-                      models.chosen = get_built_models(myBiomodModelOut5)[c(1,3,5,7,9,11,13,15,17,19,21,23,25,27,29,31,33,35,37,39)],
+                      models.chosen = get_built_models(myBiomodModelOut5),
                       fixed.var = 'median')
 
 
 response_curves_data <- response_curves$plot$data
+
+install.packages('viridis')
+install.packages('foreach')
 
 library("viridis")
 library("foreach")
@@ -1442,37 +1390,6 @@ response_dist_inv_bivariate = ggplot(data_biv, aes(x = dist/1000, y = bat, fill=
 
 response_dist_inv_bivariate
 ggsave("pacs/response_dist_inv_bivariate.png", width = 10, height = 8, dpi = 300)
-
-
-################################################################################
-
-#### Cola formato
-scale_x_discrete(labels = c('Matacões e Paredões','Tocas e Fendas','Grutas', "Lages", "Rochas P e M")) +
-  geom_boxplot(lwd = 0.2) +
-  scale_y_continuous(position="left", n.breaks = 10, expand = c(0, 0.05)) +
-  ggtitle("Índice de Abragência Relativa das Geomorfologias (IAR GEO)") +
-  xlab("") +
-  labs(y = "IAR GEO") +
-  #geom_jitter(color="black", size=0.2, alpha=0.5) +
-  theme(
-    panel.background = element_blank(),
-    axis.ticks.y = element_line(colour = "grey",
-                                linewidth = 0.8, linetype = "solid"),
-    axis.line.y = element_line(colour = "grey",
-                               linewidth = 0.8, linetype = "solid"),
-    axis.text.x = element_text(size = 13,  color = "#284b80" ),
-    axis.text.y = element_text(size = 15,  color = "grey" ),
-    axis.title.y = element_text(size = 14,  color = "#284b80" ),
-    legend.position="none",
-    axis.ticks.x = element_blank(), 
-    plot.title = element_text(hjust = 0.5, size = 18, color ="#284b80" )
-  )
-
-
-bp_all_local
-ggsave("plots/geo_local.png", width = 10, height = 5, dpi = 300)
-
-####################################################################################
 
 
 # Projection # no need ensemble because is just one model. The projection make 
