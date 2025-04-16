@@ -1188,14 +1188,14 @@ eval_list_table <- eval_list %>%
 print(eval_list_table, n = 36)
 
 #Salvando o resultado do melhor modelo
-save(eval_list_table, myBiomodModelOut5, file = "modelling_result_data_20250411.RData")
+save(eval_list_table, myBiomodModelOut5, file = "modelling_result_data_20250416.RData")
 
 ##Plotting the eval list table
 eval_models_df <- data.table(do.call(cbind, eval_list_table))
 mytheme <- ttheme_default(base_size = 10, base_colour = 'black', base_family = "TT Times New Roman",
                           parse = FALSE, padding = unit(c(3, 3), "mm",))
 grid.table(eval_models_df[1:10,],  theme = mytheme)
-save(grid.table, file = "eval_models_table_20240410.Rplot")
+save(grid.table, file = "eval_models_table_20250416.Rplot")
 
 #OU
 
@@ -1217,16 +1217,16 @@ grid.table(eval_models_df[1:10, ],  theme = mytheme)
 #Modelo com a melhor performance
 
 #Obtendo a importância das variáveis
-varimp <- get_variables_importance(myBiomodModelOut5)
+varimp <- get_variables_importance(myBiomodModelOut24)
 str(varimp)
 
 ### Figures
 
 # Variable Importance
-var_imp_model5 <- get_variables_importance(myBiomodModelOut5)
+var_imp_model24 <- get_variables_importance(myBiomodModelOut24)
 
 # boxplot
-var_imp_boxplot = var_imp_model5 %>% 
+var_imp_boxplot = var_imp_model24 %>% 
   filter(algo == "RF") %>% 
   ggplot(aes(x = expl.var, 
              y = var.imp,
@@ -1237,7 +1237,7 @@ var_imp_boxplot = var_imp_model5 %>%
   scale_y_continuous(breaks = seq(0, 1, 0.1), 
                      labels = paste0(seq(0, 100, 10), "%"),
                      expand = c(0, 0)) + 
-  scale_x_discrete(labels = c("Batimetria (m)","Distância primeiros focos (m)")) +
+  scale_x_discrete(labels = c("Distância primeiros focos (m)", "Distância portos e marinas (km)")) +
      theme(
     panel.background = element_blank(),
     axis.title.x = element_blank(), 
@@ -1265,8 +1265,8 @@ ggsave("pacs_figs/var_imp_boxplot.png", width = 10, height = 5, dpi = 300)
 # Response curve
 
 # get data from bm_PlotResponseCurves
-response_curves<- bm_PlotResponseCurves(bm.out = myBiomodModelOut5,
-                      models.chosen = get_built_models(myBiomodModelOut5),
+response_curves<- bm_PlotResponseCurves(bm.out = myBiomodModelOut24,
+                      models.chosen = get_built_models(myBiomodModelOut24),
                       fixed.var = 'median')
 
 
@@ -1280,14 +1280,14 @@ library("foreach")
 palette <- viridis_pal(option = "viridis")(21)
 
 # plot
-response_bat = response_curves_data %>%
-  filter(expl.name == "bat") %>% 
+response_dist_inv = response_curves_data %>%
+  filter(expl.name == "dist_inv") %>% 
   ggplot( aes(x = expl.val, y = pred.val, 
                      color = pred.name)) +
   geom_line(size = 1) +
   scale_color_manual(values = palette) +
   scale_y_continuous(position="left", n.breaks = 10, expand = c(0, 0), limits = c(0,1)) +
-  labs(y = "Predição", x = "Batimetria (m)") +
+  labs(y = "Predição", x = "Distância dos focos RN e Engenho (km)") +
   theme(#plot.title = element_text(hjust = 0.5, size = 14, face = "bold", color = "#284b80"),
     panel.background = element_blank(),
     axis.ticks.y = element_line(colour = "grey",
@@ -1305,11 +1305,11 @@ response_bat = response_curves_data %>%
     legend.position="none"
     )
 
-response_bat
-ggsave("pacs_figs/reponse_bat.png", width = 10, height = 5, dpi = 300)
+response_dist_inv
+ggsave("pacs_figs/reponse_dist_inv.png", width = 10, height = 5, dpi = 300)
   
-response_dist_inv = response_curves_data %>%
-  filter(expl.name == "dist_inv") %>% 
+response_d_mar = response_curves_data %>%
+  filter(expl.name == "d_mar") %>% 
   ggplot( aes(x = expl.val/1000, y = pred.val, 
               color = pred.name)) +
   geom_line(size = 1) +
@@ -1317,7 +1317,7 @@ response_dist_inv = response_curves_data %>%
   scale_y_continuous(position="left", n.breaks = 10, expand = c(0, 0), limits = c(0,1)) +
   scale_x_continuous(position="bottom", n.breaks = 20, expand = c(0, 0)) +
   
-  labs(y = "Predição", x = "Distância dos Focos RN e Engenho (Km)") +
+  labs(y = "Predição", x = "Distância de Portos e Marinas (Km)") +
   theme(
     panel.background = element_blank(),
     axis.ticks.y = element_line(colour = "grey",
@@ -1335,36 +1335,36 @@ response_dist_inv = response_curves_data %>%
     legend.position="none"
   )  
   
-response_dist_inv
-ggsave("pacs_figs/response_dist_inv.png", width = 10, height = 5, dpi = 300)
+response_d_mar
+ggsave("pacs_figs/response_d_mar.png", width = 10, height = 5, dpi = 300)
 
 
 # Response bivariate all models
 
-response_curves_bivariate<- bm_PlotResponseCurves(bm.out = myBiomodModelOut5,
-                                        models.chosen = get_built_models(myBiomodModelOut5)[c(1,3,5,7,9,11,13,15,17,19,21,23,25,27,29,31,33,35,37,39)],
+response_curves_bivariate<- bm_PlotResponseCurves(bm.out = myBiomodModelOut24,
+                                        models.chosen = get_built_models(myBiomodModelOut24)[c(1,3,5,7,9,11,13,15,17,19,21,23,25,27,29,31,33,35,37,39)],
                                         fixed.var = 'median',
                                         do.bivariate = TRUE)
 response_curves_bivariate_data = response_curves_bivariate$tab
 
-bat = response_curves_bivariate_data %>% 
-  filter(expl.name == "bat", comb == "bat+dist_inv") %>%  
+d_mar = response_curves_bivariate_data %>% 
+  filter(expl.name == "d_mar", comb == "dist_inv+d_mar") %>%  
   select(expl.val)
 dist = response_curves_bivariate_data %>% 
-  filter(expl.name == "dist_inv", comb == "bat+dist_inv") %>% 
+  filter(expl.name == "dist_inv", comb == "dist_inv+d_mar") %>% 
   select(expl.val)
 pred = response_curves_bivariate_data %>% 
-  filter(expl.name == "dist_inv", comb == "bat+dist_inv") %>% 
+  filter(expl.name == "dist_inv", comb == "dist_inv+d_mar") %>% 
   select(pred.val)
 
 
-data_biv = cbind(bat, dist, pred)
-names(data_biv) = c("bat", "dist", "pred")
+data_biv = cbind(dist, d_mar, pred)
+names(data_biv) = c("dist", "d_mar", "pred")
 
-response_dist_inv_bivariate = ggplot(data_biv, aes(x = dist/1000, y = bat, fill=pred )) + 
+response_dist_inv_bivariate = ggplot(data_biv, aes(x = dist/1000, y = d_mar/1000, fill=pred )) + 
   geom_tile() +
-  xlab("Distância da Invasão (Km)") +
-  ylab("Batimetria (m)") +
+  xlab("Distância Focos RN e Engenho (km)") +
+  ylab("Distância Portos e Marinas (km)") +
   labs(fill = "Predição") +
   scale_fill_continuous(n.breaks = 3, limits = c(0,1)) +
   scale_y_continuous(position="left", n.breaks = 10, expand = c(0, 0)) +
@@ -1378,9 +1378,9 @@ response_dist_inv_bivariate = ggplot(data_biv, aes(x = dist/1000, y = bat, fill=
     axis.line.x = element_line(colour = "grey",
                                linewidth = 0.8, linetype = "solid"),
     axis.text.x = element_text(size = 14,  color = "#284b80" ),
-    axis.text.y = element_text(size = 14,  color = "#284b80" ),
-    axis.title.x = element_text(size = 16,  color = "#284b80" ),
-    axis.title.y = element_text(size = 16,  color = "#284b80" ),
+    axis.text.y = element_text(size = 14,  color = "grey" ),
+    axis.title.x = element_text(size = 18,  color = "#284b80", margin = margin(t = 10) ),
+    axis.title.y = element_text(size = 18,  color = "#284b80", margin = margin(r = 10)),
     axis.ticks.x = element_blank(), 
     plot.title = element_text(hjust = 0.5, size = 18, color ="#284b80"),
     legend.title = element_text(face = "bold", color = "#284b80"),
@@ -1393,10 +1393,10 @@ ggsave("pacs/response_dist_inv_bivariate.png", width = 10, height = 8, dpi = 300
 
 # Projection # no need ensemble because is just one model. The projection make 
 
-myBiomodProj <- BIOMOD_Projection(bm.mod = myBiomodModelOut5,
+myBiomodProj <- BIOMOD_Projection(bm.mod = myBiomodModelOut24,
                                   proj.name = 'Current',
-                                  new.env = predictors5,
-                                  models.chosen = get_built_models(myBiomodModelOut5),
+                                  new.env = predictors24,
+                                  models.chosen = get_built_models(myBiomodModelOut24),
                                   metric.binary = 'TSS',
                                   metric.filter = 'TSS',
                                   build.clamping.mask = TRUE)
