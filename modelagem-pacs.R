@@ -11,7 +11,7 @@
 
 # set woriking diretory as short as possible to avoid a bug in BIOMOD_EnsembleModeling()
 setwd("C:/Users/sunco/OneDrive/Área de Trabalho/pacs_modelo2/modeling_pacs")
-
+setwd("C:/Users/Victoria/OneDrive/Área de Trabalho/modeling_pacs")
 
 ## Instalando os pacotes
 install.packages("raster")
@@ -29,7 +29,7 @@ install.packages("ggtext")
 install.packages("data.table")
 install.packages("gridExtra")
 install.packages("tidyverse")  
-install.packages('ggplot2') 
+install.packages("ggplot2", type = "source") 
 install.packages('randomForest') 
 
 
@@ -1179,16 +1179,16 @@ eval_list_table <- eval_list %>%
   bind_rows(eval_list) %>%
     group_by(model, preds) %>%
   summarise(avg_validation = mean(validation, na.rm = TRUE),
-            sd_validation = round(sd(validation, na.rm = TRUE), digits = 3),
-            avg_sensitivity = round(mean(sensitivity, na.rm = TRUE), digits = 3),
-            avg_specificity = round(mean(specificity, na.rm = TRUE), digits = 3),
-            avg_TSS = round((mean(sensitivity) + mean(specificity) - 100), digits = 3)) %>% 
+            sd_validation = (sd(validation, na.rm = TRUE)),
+            avg_sensitivity = (mean(sensitivity)),
+            avg_specificity = (mean(specificity)),
+            avg_TSS = ((mean(sensitivity) + mean(specificity)) - 100)) %>% 
   arrange(-avg_validation)
   
-print(eval_list_table)
+print(eval_list_table, n = 36)
 
 #Salvando o resultado do melhor modelo
-save(eval_list_table, myBiomodModelOut5, file = "modelling_result_data_20240410.RData")
+save(eval_list_table, myBiomodModelOut5, file = "modelling_result_data_20250411.RData")
 
 ##Plotting the eval list table
 eval_models_df <- data.table(do.call(cbind, eval_list_table))
@@ -1233,31 +1233,31 @@ var_imp_boxplot = var_imp_model5 %>%
              fill = expl.var
               )) +
   geom_boxplot() +
-  scale_fill_manual(values=c('lightblue', 'orange' )) +
+  scale_fill_manual(values=c('azure3', 'orange2' )) +
   scale_y_continuous(breaks = seq(0, 1, 0.1), 
                      labels = paste0(seq(0, 100, 10), "%"),
                      expand = c(0, 0)) + 
-  scale_x_discrete(labels = c("Batimetria (m)", "Distância primeiros focos (m)" )) +
-  ggtitle("Importância das Variáveis") +
-  xlab("Preditor") + 
-  ylab("Importância") + 
-  theme(
+  scale_x_discrete(labels = c("Batimetria (m)","Distância primeiros focos (m)")) +
+     theme(
     panel.background = element_blank(),
+    axis.title.x = element_blank(), 
+    axis.title.y = element_blank(),
     axis.ticks.y = element_line(colour = "darkgrey",
                                 linewidth = 0.5, linetype = "solid"),
     axis.line.y = element_line(colour = "darkgrey",
                                linewidth = 0.5, linetype = "solid"),
-    axis.line.x = element_line(colour = "darkgrey",
-                               linewidth = 0.5, linetype = "solid"),
-    axis.text.x = element_text(size = 10,  color = "black" ),
-    axis.text.y = element_text(size = 10,  color = "black" ),
+    #axis.line.x = element_line(colour = "darkgrey",
+                               #linewidth = 0.5, linetype = "solid"),
+    axis.text.x = element_text(size = 12,  color = "#284b80" ),
+    axis.text.y = element_text(size = 12,  color = "grey" ),
     axis.ticks.x = element_blank(),
     legend.title = element_blank(),
     legend.position="none",
     legend.key = element_rect(fill = "white"),
-    plot.title = element_text(hjust = 0.5, size = 15, color ="black" )
+    #plot.title = element_text(hjust = 0.5, size = 15, color ="black" )
     ) 
-    
+
+colours()
 # Save
 var_imp_boxplot
 ggsave("pacs_figs/var_imp_boxplot.png", width = 10, height = 5, dpi = 300)
@@ -1277,7 +1277,7 @@ install.packages('foreach')
 
 library("viridis")
 library("foreach")
-palette <- viridis_pal(option = "viridis")(20)
+palette <- viridis_pal(option = "viridis")(21)
 
 # plot
 response_bat = response_curves_data %>%
@@ -1287,9 +1287,8 @@ response_bat = response_curves_data %>%
   geom_line(size = 1) +
   scale_color_manual(values = palette) +
   scale_y_continuous(position="left", n.breaks = 10, expand = c(0, 0), limits = c(0,1)) +
-
-  labs(y = "Prediction", x = "Batimetria (m)") +
-  theme(
+  labs(y = "Predição", x = "Batimetria (m)") +
+  theme(#plot.title = element_text(hjust = 0.5, size = 14, face = "bold", color = "#284b80"),
     panel.background = element_blank(),
     axis.ticks.y = element_line(colour = "grey",
                                 linewidth = 0.8, linetype = "solid"),
@@ -1299,10 +1298,10 @@ response_bat = response_curves_data %>%
                                 linewidth = 0.8, linetype = "solid"),
     axis.line.x = element_line(colour = "grey",
                                linewidth = 0.8, linetype = "solid"),
-    axis.text.x = element_text(size = 13,  color = "#284b80" ),
-    axis.text.y = element_text(size = 15,  color = "grey" ),
-    axis.title.y = element_text(size = 14,  color = "#284b80" ),
-    axis.title.x = element_text(size = 14,  color = "#284b80" ),
+    axis.text.x = element_text(size = 12,  color = "#284b80" ),
+    axis.text.y = element_text(size = 12,  color = "grey" ),
+    axis.title.y = element_text(size = 12,  color = "#284b80" ),
+    axis.title.x = element_text(size = 12,  color = "#284b80" ),
     legend.position="none"
     )
 
@@ -1318,7 +1317,7 @@ response_dist_inv = response_curves_data %>%
   scale_y_continuous(position="left", n.breaks = 10, expand = c(0, 0), limits = c(0,1)) +
   scale_x_continuous(position="bottom", n.breaks = 20, expand = c(0, 0)) +
   
-  labs(y = "Prediction", x = "Distance (Km)") +
+  labs(y = "Predição", x = "Distância dos Focos RN e Engenho (Km)") +
   theme(
     panel.background = element_blank(),
     axis.ticks.y = element_line(colour = "grey",
@@ -1329,10 +1328,10 @@ response_dist_inv = response_curves_data %>%
                                 linewidth = 0.8, linetype = "solid"),
     axis.line.x = element_line(colour = "grey",
                                linewidth = 0.8, linetype = "solid"),
-    axis.text.x = element_text(size = 13,  color = "#284b80" ),
-    axis.text.y = element_text(size = 15,  color = "grey" ),
-    axis.title.y = element_text(size = 14,  color = "#284b80" ),
-    axis.title.x = element_text(size = 14,  color = "#284b80" ),
+    axis.text.x = element_text(size = 12,  color = "#284b80" ),
+    axis.text.y = element_text(size = 12,  color = "grey" ),
+    axis.title.y = element_text(size = 12,  color = "#284b80" ),
+    axis.title.x = element_text(size = 12,  color = "#284b80" ),
     legend.position="none"
   )  
   
@@ -1408,7 +1407,7 @@ plot(teste/1000)
 plot(land, add = TRUE, col = "grey")
 
 
-Zlist.files("Tubastraea.coccinea./proj_current/")
+list.files("Tubastraea.coccinea./proj_current/")
 
 
 plot(myBiomodProj)
